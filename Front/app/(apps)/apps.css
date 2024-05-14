@@ -1,0 +1,89 @@
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 2vh 1vw 0;
+}
+
+.margin {
+  flex: 0 1 33.3%;
+}
+
+.card {
+  min-height: 10vh;
+  margin: 5px;
+  padding: 10px;
+  border: 2px solid #333;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.click {
+  cursor: pointer;
+}
+
+.card-row {
+  padding: 0 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0 10px;
+}
+
+.card-title {
+  font-size: clamp(1em, 2vw, 1.2em);
+  font-weight: bold;
+}
+
+.card-btns {
+  margin-left: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.card-btn {
+  cursor: pointer;
+  font-size: clamp(1em, 2vw, 1.2em);
+}
+
+.card-big-btn {
+  cursor: pointer;
+  font-size: clamp(1.2em, 5vw, 2em);
+  margin: 2px;
+}
+
+.color-select {
+  border: none;
+  height: 24px;
+  width: 40px;
+}
+
+.card-input {
+  padding: 5px;
+  width: calc(100% - 10px);
+  border: 1px solid lightgray;
+  resize: none;
+  overflow: none;
+  background-color: transparent;
+}
+
+@media screen and (max-width: 1120px) {
+  .margin {
+    flex: 0 1 50%;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .margin {
+    flex: 0 1 80%;
+    margin: auto;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .margin {
+    flex: 0 1 100%;
+    margin: auto;
+  }
+}

@@ -1,0 +1,89 @@
+.contact-margin {
+  flex: 0 1 20%;
+  height: 40vh;
+}
+
+.contact-card {
+  display: flex;
+  flex-direction: column;
+  height: calc(40vh - 8px);
+  margin: 4px;
+  border: 1px solid #333;
+  box-shadow: var(--shadow);
+}
+
+.contact-card * {
+  color: var(--fontColor_pri);
+}
+
+.contact-image {
+  width: 16vh;
+  height: auto;
+  margin: auto;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  background-color: transparent;
+}
+
+.contact-title {
+  margin: 2px;
+  font-size: clamp(0.9em, 1.5vw, 1.2em);
+  font-weight: bold;
+  text-align: center;
+  background-color: transparent;
+  border: 1px solid #333;
+}
+
+.contact-input {
+  font-size: clamp(0.8em, 1vw, 1em);
+  margin: 2px;
+  text-align: center;
+  background-color: transparent;
+  border: 1px solid #333;
+}
+
+.div-align-contact-info {
+  width: 100%;
+  height: auto;
+  padding: 0;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-align-btns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: auto 1vw 0;
+}
+
+.contact-save,
+.delete-btn {
+  cursor: pointer;
+  font-size: clamp(0.9em, 1vw, 1em);
+}
+
+.contact-colorSelect {
+  border: none;
+  height: 24px;
+  width: 40px;
+}
+
+@media screen and (max-width: 860px) {
+  .contact-margin {
+    flex: 0 0 25%;
+  }
+}
+
+@media screen and (max-width: 620px) {
+  .contact-margin {
+    flex: 0 0 33.33%;
+  }
+}
+
+@media screen and (max-width: 440px) {
+  .contact-margin {
+    flex: 0 0 50%;
+  }
+}

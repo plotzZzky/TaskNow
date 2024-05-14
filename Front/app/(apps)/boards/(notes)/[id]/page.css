@@ -1,0 +1,44 @@
+.note-margin {
+  flex: 0 1 25%;
+  height: 40vh;
+}
+
+.note-card {
+  display: flex;
+  flex-direction: column;
+  height: calc(40vh - 8px);
+  margin: 5px;
+  padding: 5px;
+  background-color: rgb(182, 253, 206);
+  box-shadow: var(--shadow);
+}
+
+.note-text {
+  flex: 0 1 90%;
+  padding: 0.5vh 0.5vw;
+  margin: 5px;
+  font-size: clamp(0.8em, 1vw, 1em);
+  background-color: transparent;
+  border: 1px solid lightgray;
+  resize: none;
+  white-space: pre-line;
+  text-align: left;
+}
+
+.note-date {
+  color: var(--fontColor_pri);
+  font-size: clamp(0.8em, 1vw, 1em);
+  font-weight: bold;
+}
+
+@media screen and (max-width: 800px) {
+  .note-margin {
+    flex: 0 1 33.33%;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .note-margin {
+    flex: 0 1 50%;
+  }
+}

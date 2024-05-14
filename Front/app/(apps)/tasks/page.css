@@ -1,0 +1,30 @@
+.align-task {
+  display: flex;
+  margin: 0;
+  padding: 5px;
+  gap: 3.5vh 0;
+  flex-direction: column;
+  justify-content: space-between;
+  list-style: none;
+}
+
+.task-data {
+  font-size: 0.8em;
+}
+
+/* Comments */
+.comment-div {
+  margin: 5px 0;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid lightgray;
+}
+
+.comment-input {
+  flex: 1 1 100%;
+  text-align: start;
+  margin: -5px;
+  padding: 5px;
+}
