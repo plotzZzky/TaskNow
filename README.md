@@ -6,6 +6,7 @@
 
 ![TaskNow](https://github.com/plotzZzky/TaskNow/assets/12895974/e8fba28d-7d33-46f5-a51e-86f8c2293a3e)
 ![TaskNow_b](https://github.com/plotzZzky/TaskNow/assets/12895974/1a926a53-d802-46a2-9996-cc6bd86d975e)
+![TaskNow_c](https://github.com/plotzZzky/TaskNow/assets/12895974/e4885e74-886a-489f-b465-766457cf98b3)
 
 
 ## Caracteristicas:
