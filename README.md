@@ -4,6 +4,10 @@
 
 #### Plataforma para gerenciar sua vida, atraves de notas, tarefas, favoritos e contatos.
 
+![TaskNow](https://github.com/plotzZzky/TaskNow/assets/12895974/e8fba28d-7d33-46f5-a51e-86f8c2293a3e)
+![TaskNow_b](https://github.com/plotzZzky/TaskNow/assets/12895974/1a926a53-d802-46a2-9996-cc6bd86d975e)
+
+
 ## Caracteristicas:
 - [ ] Em desenvolvimento;
 - [x] Sistema de login;
