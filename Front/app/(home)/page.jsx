@@ -70,7 +70,7 @@ export default function Home() {
     <div>
       <div className='page-home banner' id='Start'>
         <h1 className='big-title'> TaskNow <FontAwesomeIcon icon={faCheckSquare} className='market-icon' /> </h1>
-        <h2 className='subtitle'> O jeito facil de gerenciar sua vida. </h2>
+        <h2 className='subtitle'> O jeito fácil de gerenciar sua vida. </h2>
 
         <div className='home-align-btns'>
           <button onClick={goToLogin}> Começar agora! </button>

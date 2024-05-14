@@ -1,5 +1,5 @@
 <h1 align="center"> TaskNow </h1>
-<h2 align="center"> O geito facil de gerenciar sua vida. </h2>
+<h2 align="center"> O jeito facil de gerenciar sua vida. </h2>
 
 
 #### Plataforma para gerenciar sua vida, atraves de notas, tarefas, favoritos e contatos.

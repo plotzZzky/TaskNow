@@ -11,7 +11,7 @@ export default function Footer() {
     <footer>
       <div className='brand'>
         <span className='brand-title'> TaskNow </span>
-        <span className='brand-name'> O geito facil de gerenciar sua vida. </span>
+        <span className='brand-name'> O jeito fácil de gerenciar sua vida. </span>
       </div>
 
 
