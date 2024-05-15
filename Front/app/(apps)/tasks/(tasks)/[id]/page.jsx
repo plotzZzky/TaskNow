@@ -24,7 +24,8 @@ export default function Tasks() {
   function getAllCards() {
     // Busca as informações dos cards no back
     checkLogin()
-    const url = "http://127.0.0.1:8000/tasks/";
+    const taskId = urlParamters.id
+    const url = `http://127.0.0.1:8000/tasks/${taskId}/`;
 
     const data = {
       method: 'GET',

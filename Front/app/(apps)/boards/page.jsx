@@ -65,7 +65,7 @@ export default function Boards() {
       .then((data) => {
         setBoardTitle("Nome da tarefa")
         setBoardDesc("Descrição da tarefa")
-        createCards(data)
+        getAllBoards()
       })
   }
 

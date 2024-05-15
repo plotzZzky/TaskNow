@@ -13,18 +13,19 @@ class TaskViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = TaskSerializer
-    queryset = TaskModel.objects.all()
 
     def list(self, request, *args, **kwargs):
-        """ Lista todas as tarefas """
-        query = self.get_queryset()
+        """ Desativado por ser necessario """
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def retrieve(self, request, *args, **kwargs):
+        """ Retorna a lista com todas as tarefas do projeto atual """
+        project_id = kwargs['pk']
+        project = ProjectModel.objects.get(pk=project_id)  # Id do projeto com as tarefas
+        query = TaskModel.objects.filter(project=project)
         serializer = self.get_serializer(query, many=True)
         items = sorted(serializer.data, key=sorted_by_status)
         return Response(items, status=status.HTTP_200_OK)
-
-    def retrieve(self, request, *args, **kwargs):
-        """ Desativado por não ser necessario """
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def create(self, request, *args, **kwargs):
         """ Cria uma nova tarefa """
@@ -34,6 +35,7 @@ class TaskViewSet(ModelViewSet):
             title = request.data['title']
             desc = request.data.get('desc', '')
             TaskModel.objects.create(project=project, title=title, desc=desc, status=1)
+
             return Response({"msg": "Board criado"}, status=status.HTTP_200_OK)
         except KeyError:
             return Response({"msg": "Não foi possivel criar a tarefa!"}, status=status.HTTP_400_BAD_REQUEST)
@@ -56,6 +58,7 @@ class TaskViewSet(ModelViewSet):
             if 0 <= int(task_status) < 4:  # Impede que o valor seja alterado para alem da lista de status
                 task.status = task_status
                 task.save()
+
             return Response({"msg": "Status atualizado!"}, status=status.HTTP_200_OK)
         except (KeyError, TypeError):
             return Response({"error": "Valores invalidos"}, status=status.HTTP_400_BAD_REQUEST)
@@ -83,6 +86,7 @@ class CommentViewSet(ModelViewSet):
             CommentModel.objects.create(task=task, text=text)
             task = TaskModel.objects.get(pk=task_id)
             serializer = CommentSerializer(task.comments.all(), many=True)
+
             return Response(serializer.data, status=status.HTTP_200_OK)
         except (KeyError, ValueError):
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
@@ -96,6 +100,7 @@ class CommentViewSet(ModelViewSet):
             task_id = comment.task.id
             task = TaskModel.objects.get(pk=task_id)
             serializer = CommentSerializer(task.comments.all(), many=True)
+
             return Response(serializer.data, status=status.HTTP_200_OK)
         except (KeyError, ValueError, CommentModel.DoesNotExist):   # type: ignore
             return Response({}, status=status.HTTP_400_BAD_REQUEST)

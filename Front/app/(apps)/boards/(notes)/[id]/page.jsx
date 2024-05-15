@@ -28,7 +28,8 @@ export default function Notes() {
 
   // Notes
   function getAllNotes() {
-    const url = "http://127.0.0.1:8000/notes/"
+    const boardId = urlParamters.id
+    const url = `http://127.0.0.1:8000/notes/${boardId}/`
     const data = {
       method: 'GET',
       headers: { Authorization: 'Token ' + Token}
@@ -58,7 +59,6 @@ export default function Notes() {
     form.append("title", getTitle);
     form.append("desc", getDesc);
     form.append("color", getColor)
-    console.log(getColor, getDesc, getTitle)
 
     const data = {
       method: 'POST',

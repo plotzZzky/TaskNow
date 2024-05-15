@@ -113,7 +113,7 @@ export default function Login() {
       .then((res) =>  res.json())
       .then((data) => {
         if (data.token) {
-          sessionStorage.setItem("token", data.token)
+          updateToken(data.token)
           router.push('/tasks')
         } else {
           const tip = document.getElementById("SignTip")

@@ -1,5 +1,4 @@
 'use client'
-import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faBars, faHome, faQuestion, faUsers, faRightFromBracket, faCheckSquare, faNoteSticky, faGlobeEurope } from '@fortawesome/free-solid-svg-icons'

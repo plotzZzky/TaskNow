@@ -10,11 +10,10 @@ from .serializer import ContactSerializer
 class ContactView(ModelViewSet):
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post', 'delete']
-    queryset = ContactModel.objects.all()
     serializer_class = ContactSerializer
 
     def list(self, request, *args, **kwargs):
-        query = self.get_queryset()
+        query = ContactModel.objects.filter(user=request.user)
         serializer = self.get_serializer(query, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -41,6 +40,7 @@ class ContactView(ModelViewSet):
             contact_id = kwargs['pk']
             contact = ContactModel.objects.get(pk=contact_id)
             contact.delete()
+
             return Response({"msg": "Contato deletado!"}, status=status.HTTP_200_OK)
         except (ValueError, KeyError, TypeError, ContactModel.DoesNotExist):  # type:ignore
             return Response(status=status.HTTP_400_BAD_REQUEST)
