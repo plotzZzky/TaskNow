@@ -67,9 +67,10 @@ export default function Notes() {
     }
 
     fetch(url, data)
-      .then(() => {
+      .then((res) => res.json())
+      .then((data) => {
         setFormDefault();
-        getAllNotes();
+        createNotesCard(data)
       });
   }
 

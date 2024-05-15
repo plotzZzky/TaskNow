@@ -39,7 +39,7 @@ export default function Contacts() {
   function createContactsCard(contacts) {
     setContactsCard(
       contacts.map((data) => (
-        <ContactCard key={data.id} data={data} update={getAllContacts} ></ContactCard>))
+        <ContactCard key={data.id} data={data} createCard={createContactsCard} ></ContactCard>))
     )
   }
 

@@ -31,7 +31,10 @@ class ContactView(ModelViewSet):
             user = request.user
             ContactModel.objects.create(user=user, name=name, telephone=telephone, email=email, color=color)
 
-            return Response({"text": "Contato criado"}, status=status.HTTP_200_OK)
+            query = ContactModel.objects.filter(user=request.user)
+            serializer = self.get_serializer(query, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except (KeyError, ValueError, TypeError):
             return Response({"text": "Formulario incorreto"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -41,6 +44,9 @@ class ContactView(ModelViewSet):
             contact = ContactModel.objects.get(pk=contact_id)
             contact.delete()
 
-            return Response({"msg": "Contato deletado!"}, status=status.HTTP_200_OK)
+            query = ContactModel.objects.filter(user=request.user)
+            serializer = self.get_serializer(query, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except (ValueError, KeyError, TypeError, ContactModel.DoesNotExist):  # type:ignore
             return Response(status=status.HTTP_400_BAD_REQUEST)

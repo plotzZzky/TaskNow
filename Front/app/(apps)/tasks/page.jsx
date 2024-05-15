@@ -41,7 +41,7 @@ export default function Projects() {
     // Cria os cards dos projetos
     setCards(
       value.map((data, index) => (
-        <ProjectCard key={index} data={data} getAllCards={getAllCards}></ProjectCard>
+        <ProjectCard key={index} data={data} createCards={createCards}></ProjectCard>
       ))
     );
   }
@@ -65,7 +65,7 @@ export default function Projects() {
       .then((data) => {
         setTaskTitle("Nome da tarefa")
         setTaskDesc("Descrição da tarefa")
-        getAllCards()
+        createCards(data)
       })
   }
 

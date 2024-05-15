@@ -30,7 +30,10 @@ class ProjectViewSet(ModelViewSet):
             user = request.user
             ProjectModel.objects.create(title=title, desc=desc, user=user)
 
-            return Response({"msg": "Projeto criado!"}, status=status.HTTP_200_OK)
+            query = ProjectModel.objects.filter(user=request.user)
+            serializer = self.get_serializer(query, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except KeyError:
             return Response({'error': 'Nome invalido'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -41,6 +44,9 @@ class ProjectViewSet(ModelViewSet):
             project = ProjectModel.objects.get(pk=project_id)
             project.delete()
 
-            return Response({"msg": "Projeto deletado!"}, status=status.HTTP_200_OK)
+            query = ProjectModel.objects.filter(user=request.user)
+            serializer = self.get_serializer(query, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except KeyError:
             return Response({"error": "Projecto não encontrado"}, status=status.HTTP_400_BAD_REQUEST)

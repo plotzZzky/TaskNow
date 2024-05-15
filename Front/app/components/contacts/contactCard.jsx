@@ -27,9 +27,10 @@ export default function ContactCard(props) {
     }
 
     fetch(url, data)
-      .then(() => {
+      .then((res) => res.json())
+      .then((data) => {
         event.stopPropagation();
-        props.update()
+        props.createCard(data)
       })
   }
 

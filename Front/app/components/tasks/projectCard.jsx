@@ -24,8 +24,9 @@ export default function ProjectCard(props) {
     }
 
     fetch(url, data)
-      .then(() => {
-        props.getAllCards()
+    .then((res) => res.json())
+    .then((data) => {
+        props.createCards(data)
       })
   }
 

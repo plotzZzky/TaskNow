@@ -33,7 +33,11 @@ class BoardsView(ModelViewSet):
             desc = request.data.get('desc', '')
             user = request.user
             BoardModel.objects.create(user=user, title=title, desc=desc)
-            return Response({"msg": "Novo board criado!"}, status=status.HTTP_200_OK)
+
+            query = BoardModel.objects.filter(user=request.user)
+            serializer = self.serializer_class(query, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except (KeyError, ValueError, TypeError):
             return Response({"error": "Titulo não valido"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -43,8 +47,10 @@ class BoardsView(ModelViewSet):
             board_id = kwargs['pk']
             board = BoardModel.objects.get(pk=board_id)
             board.delete()
-            query = self.get_queryset()
+
+            query = BoardModel.objects.filter(user=request.user)
             serializer = self.serializer_class(query, many=True)
+
             return Response(serializer.data, status=status.HTTP_200_OK)
         except (KeyError, ValueError, TypeError, BoardModel.DoesNotExist):  # type:ignore
             return Response({"error": "Board não encontrado"}, status=status.HTTP_400_BAD_REQUEST)

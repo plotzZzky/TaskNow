@@ -40,7 +40,7 @@ export default function Sites() {
   function createSitesCard(sites, index) {
     setSitesCard(
       sites.map((data) => (
-        <SiteCard key={index} data={data} update={getAllSites} ></SiteCard>))
+        <SiteCard key={index} data={data} createCards={createSitesCard} ></SiteCard>))
     )
   }
 
@@ -58,9 +58,10 @@ export default function Sites() {
     }
 
     fetch(url, data)
-      .then(() => {
+      .then((res) => res.json())
+      .then((data) => {
         setFormDefault();
-        getAllSites();
+        createSitesCard(data)
       });
   }
 

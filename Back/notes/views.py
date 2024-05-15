@@ -21,6 +21,7 @@ class NoteView(ModelViewSet):
         board_id = kwargs['pk']  # Id do board de notas
         board = BoardModel.objects.get(pk=board_id)
         query = NotesModel.objects.filter(board=board)
+
         serializer = self.get_serializer(query, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -35,7 +36,11 @@ class NoteView(ModelViewSet):
             color = request.data.get('color', '#FFF')
             NotesModel.objects.create(board=board, title=title, desc=desc, date=date, color=color)
 
-            return Response({"text": "Nota criada"}, status=status.HTTP_200_OK)
+            board = BoardModel.objects.get(pk=board_id)
+            query = NotesModel.objects.filter(board=board)
+            serializer = self.get_serializer(query, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except (KeyError, ValueError):
             return Response({"text": "Formulario incorreto"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -46,6 +51,10 @@ class NoteView(ModelViewSet):
             note = NotesModel.objects.get(pk=note_id)
             note.delete()
 
-            return Response({"msg": "Nota deletada!"}, status=status.HTTP_200_OK)
+            board = BoardModel.objects.get(pk=note.board.id)
+            query = NotesModel.objects.filter(board=board)
+            serializer = self.get_serializer(query, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except (KeyError, ValueError, TypeError, NotesModel.DoesNotExist):  # type:ignore
             return Response({"error": "Não foi possivel deletar a nota!"}, status=status.HTTP_400_BAD_REQUEST)

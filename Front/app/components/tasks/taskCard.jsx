@@ -41,9 +41,9 @@ export default function TaskCard(props) {
 
     fetch(url, header)
       .then(res => res.json())
-      .then(() => {
+      .then((data) => {
         checkTaskStatus()
-        props.getAllCards()
+        props.createCards(data)
       })
   }
 
@@ -59,8 +59,8 @@ export default function TaskCard(props) {
 
     fetch(url, header)
       .then(res => res.json())
-      .then(() => {
-        props.getAllCards()
+      .then((data) => {
+        props.createCards(data)
       })
   }
 

@@ -43,7 +43,7 @@ export default function Tasks() {
     // Cria os cards das tarefas
     setCards(
       value.map((data, index) => (
-        <TaskCard key={index} data={data} getAllCards={getAllCards}></TaskCard>
+        <TaskCard key={index} data={data} createCards={createCards}></TaskCard>
       ))
     );
   }
@@ -68,7 +68,7 @@ export default function Tasks() {
       .then((data) => {
         setTaskTitle("Nome da tarefa")
         setTaskDesc("Descrição da tarefa")
-        getAllCards()
+        createCards(data)
       })
   }
 

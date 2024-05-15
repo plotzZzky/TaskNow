@@ -23,8 +23,9 @@ export default function SiteCard(props) {
     }
 
     fetch(url, data)
-      .then(() => {
-        props.update()
+      .then((res) => res.json())
+      .then((data) => {
+        props.createCards(data)
       })
   }
 

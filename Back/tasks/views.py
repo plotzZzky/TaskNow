@@ -25,6 +25,7 @@ class TaskViewSet(ModelViewSet):
         query = TaskModel.objects.filter(project=project)
         serializer = self.get_serializer(query, many=True)
         items = sorted(serializer.data, key=sorted_by_status)
+
         return Response(items, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
@@ -36,7 +37,12 @@ class TaskViewSet(ModelViewSet):
             desc = request.data.get('desc', '')
             TaskModel.objects.create(project=project, title=title, desc=desc, status=1)
 
-            return Response({"msg": "Board criado"}, status=status.HTTP_200_OK)
+            project = ProjectModel.objects.get(pk=project_id)  # Id do projeto com as tarefas
+            query = TaskModel.objects.filter(project=project)
+            serializer = self.get_serializer(query, many=True)
+            items = sorted(serializer.data, key=sorted_by_status)
+
+            return Response(items, status=status.HTTP_200_OK)
         except KeyError:
             return Response({"msg": "Não foi possivel criar a tarefa!"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -44,8 +50,15 @@ class TaskViewSet(ModelViewSet):
         """ Deleta um tarefa """
         try:
             task_id = kwargs['pk']
-            TaskModel.objects.get(pk=task_id).delete()
-            return Response({"msg": "A tarefa foi excluída!"}, status=status.HTTP_200_OK)
+            task = TaskModel.objects.get(pk=task_id)
+            task.delete()
+
+            project = ProjectModel.objects.get(pk=task.project.id)  # Id do projeto com as tarefas
+            query = TaskModel.objects.filter(project=project)
+            serializer = self.get_serializer(query, many=True)
+            items = sorted(serializer.data, key=sorted_by_status)
+
+            return Response(items, status=status.HTTP_200_OK)
         except (KeyError, ValueError, TypeError, TaskModel.DoesNotExist):  # type:ignore
             return Response({"error": "Tarefa não econtrada"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -59,7 +72,12 @@ class TaskViewSet(ModelViewSet):
                 task.status = task_status
                 task.save()
 
-            return Response({"msg": "Status atualizado!"}, status=status.HTTP_200_OK)
+            project = ProjectModel.objects.get(pk=task.project.id)  # Id do projeto com as tarefas
+            query = TaskModel.objects.filter(project=project)
+            serializer = self.get_serializer(query, many=True)
+            items = sorted(serializer.data, key=sorted_by_status)
+
+            return Response(items, status=status.HTTP_200_OK)
         except (KeyError, TypeError):
             return Response({"error": "Valores invalidos"}, status=status.HTTP_400_BAD_REQUEST)
 
