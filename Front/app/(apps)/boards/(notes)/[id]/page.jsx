@@ -83,8 +83,8 @@ export default function Notes() {
 
   // Sets
   function changeTitle(event) {
-    const value = event.target.textContent
-    changeTitle(value)
+    const value = event.target.value
+    setTitle(value)
   }
 
   function changeText(event) {

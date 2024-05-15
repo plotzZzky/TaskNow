@@ -1,7 +1,8 @@
 .cards {
   display: flex;
   flex-wrap: wrap;
-  margin: 2vh 1vw 0;
+  margin: 1vh 1vw 0;
+  gap: 1vh 0;
 }
 
 .margin {

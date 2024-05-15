@@ -31,14 +31,21 @@
   font-weight: bold;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 1320px) {
   .note-margin {
     flex: 0 1 33.33%;
   }
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 900px) {
   .note-margin {
     flex: 0 1 50%;
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .note-margin {
+    flex: 0 1 90%;
+    margin: auto auto;
   }
 }

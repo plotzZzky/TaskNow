@@ -79,7 +79,8 @@ export default function Home() {
 
       <div className='page-home' id='About'>
         <h1> Sobre o TaskNow... </h1>
-        <h2> {ABOUT} </h2>
+        <h2> Simplifique sua vida com o TaskNow - a plataforma tudo-em-um para gerenciar tarefas. </h2> 
+        <h2> Crie, organize, priorize de forma eficaz suas tarefas para alcançar seus objetivos com facilidade e praticidade. </h2>
 
         <h1> Benefícios: </h1>
 
