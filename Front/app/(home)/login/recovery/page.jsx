@@ -73,9 +73,9 @@ export default function Login() {
     fetch(url, requestData)
     .then((res) => res.json())
     .then((data) => {
-      if (data.msg) {
+      if (data.error) {
         const tip = document.getElementById("recoveryTip")
-        tip.innerText = data.msg
+        tip.innerText = data.error
       } else {
         router.push('/login');
       }
@@ -86,16 +86,20 @@ export default function Login() {
     <>
       <div className='page banner'>
         <div className="login-page">
-        <div className="login-alert" id='loginAlert'>
+          <div className="login-alert" id='loginAlert'>
             <a> Você precisa fazer login!</a>
           </div>
+          
           <div className='login-div' id='signupTab'>
-            <p className='login-title'> Recuperar senha </p>
+            <h2> Recuperar senha </h2>
 
             <div className='align-input'>
               <h3 style={{visibility: getVisibility? 'visible' : 'hidden'}}> Sua frase de recuperação: </h3>
-              <p> {question} </p>
+
+              <span> {question} </span>
+
               <InputUser username={setUsername} valid={UserValid} setValid={setUserValid} tip='recoveryTip' action={receiveQuestionTimer}></InputUser>
+
               <div style={{visibility: getVisibility? 'visible' : 'hidden'}}>
                 <InputAnswer answer={setAnswer} valid={AnswerValid} setValid={setAnswerValid} tip='recoveryTip'></InputAnswer>
                 <InputPwd password={setPassword} valid={Pwd1Valid} setValid={setPwd1Valid} placeholder="Digite a nova senha" tip='recoveryTip'></InputPwd>
@@ -103,11 +107,11 @@ export default function Login() {
               </div>
             </div>
 
-            <a className='login-tip' id='recoveryTip'> </a>
+            <h3 id='recoveryTip'> </h3>
 
-            <button className='btn btn-login' onClick={recoveyFunc}> Recuperar </button>
+            <button className='btn-login' onClick={recoveyFunc}> Recuperar </button>
 
-            <p className='login-link' onClick={redirectToLogin}> Entrar </p>
+            <p onClick={redirectToLogin}> Entrar </p>
           </div>
         </div>
       </div>

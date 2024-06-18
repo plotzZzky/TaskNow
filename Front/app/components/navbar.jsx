@@ -10,9 +10,9 @@ export default function NavBar() {
   const router = useRouter();
   const getPath = usePathname();
 
-  // Função que abre o menu no modo responsivo
   function openResponsiveMenu() {
-    let navbar = document.getElementsByClassName("menu")[0];
+    // Função que abre o menu no modo responsivo
+    const navbar = document.getElementById("menu");
     if (navbar.className == "menu") {
       navbar.classList.add("responsive");
     } else {
@@ -20,70 +20,70 @@ export default function NavBar() {
     }
   };
 
-  // Função que fecha o menu no modo responsivo
   function closeResponsiveMenu() {
-    let navbar = document.getElementsByClassName("menu")[0];
+    // Função que fecha o menu no modo responsivo
+    const navbar = document.getElementById("menu");
     navbar.classList.remove("responsive");
   };
 
-  // Criam os item na navbar dependendo da pagina acessada
   const ABOUT = () => {
+    // Criam os item na navbar dependendo da pagina acessada
     return getPath === '/' ? (
-      <div className="menu-item" onClick={goAbout}>
-        <a><FontAwesomeIcon icon={faUsers} className='icon-menu' /> Sobre </a>
-      </div>
+      <span onClick={goAbout}>
+        <FontAwesomeIcon icon={faUsers} className='icon-menu' /> Sobre
+      </span>
     ) : null
   };
 
   const FAQ = () => {
     return getPath === '/' ? (
-      <div className="menu-item" onClick={goFaq}>
-        <a><FontAwesomeIcon icon={faQuestion} className='icon-menu' /> Dúvidas </a>
-      </div>
+      <span onClick={goFaq}>
+        <FontAwesomeIcon icon={faQuestion} className='icon-menu' /> Dúvidas
+      </span>
     ) : null
   };
 
   const LOGIN = () => {
     return getToken === null? (
-      <div className="menu-item" onClick={goLogin}>
-        <a><FontAwesomeIcon icon={faUser} className='icon-menu' /> Entrar </a>
-      </div>
+      <span onClick={goLogin}>
+        <FontAwesomeIcon icon={faUser} className='icon-menu' /> Entrar
+      </span>
     ) : (
-      <div className="menu-item" onClick={goLogin}>
-        <a><FontAwesomeIcon icon={faRightFromBracket} className='icon-menu' /> Sair </a>
-      </div>
+      <span onClick={goLogin}>
+        <FontAwesomeIcon icon={faRightFromBracket} className='icon-menu' /> Sair
+      </span>
     )
   };
 
   const Contacts = () => {
     return getToken !== null? (
-      <div className="menu-item" onClick={goContacts}>
-        <a><FontAwesomeIcon icon={faUser} className='icon-menu' /> Contatos </a>
-      </div>
+      <span onClick={goContacts}>
+        <FontAwesomeIcon icon={faUser} className='icon-menu' /> Contatos
+      </span>
     ) : null
   }
 
   const Notes = () => {
     return getToken !== null? (
-      <div className="menu-item" onClick={goNotes}>
-        <a><FontAwesomeIcon icon={faNoteSticky} className='icon-menu' /> Notas </a>
-      </div>
+      <span onClick={goNotes}>
+        <FontAwesomeIcon icon={faNoteSticky} className='icon-menu' /> Notas
+      </span>
     ) : null
   }
 
   const Projects = () => {
     return getToken !== null? (
-      <div className="menu-item" onClick={goTasks}>
-        <a><FontAwesomeIcon icon={faCheckSquare} className='icon-menu' /> Tarefas </a>
-      </div>
+      <span onClick={goTasks}>
+        <FontAwesomeIcon icon={faCheckSquare} className='icon-menu' /> Tarefas
+      </span>
     ) : null
   }
 
   const Sites = () => {
     return getToken !== null? (
-      <div className="menu-item" onClick={goSites}>
-        <a><FontAwesomeIcon icon={faGlobeEurope} className='icon-menu' /> Sites </a>
-      </div>
+      <span onClick={goSites}>
+        <FontAwesomeIcon icon={faGlobeEurope} className='icon-menu' /> Sites
+      </span>
     ) : null
   }
 
@@ -107,8 +107,8 @@ export default function NavBar() {
     closeResponsiveMenu();
   }
 
-  //Função generica para redirecionamento, se tokne for null redireciona para /login do contrario para a pagina passada como parametro
   function genericGoTo(value) {
+    //Função generica para redirecionamento, se tokne for null redireciona para /login do contrario para a pagina passada como parametro
     if (getToken !== null && typeof getToken === 'string') {
       if (getPath !== value) {
         router.push(value);
@@ -149,15 +149,11 @@ export default function NavBar() {
     }
   }
 
-  function showEditProfile() {
-    const modal = document.getElementById("modalProfile")
-    modal.style.visibility = 'visible'
-  }
-
-  // Mostra o alerta de login
   function showLoginAlert() {
+    // Mostra o alerta de login
     const alert = document.getElementById('loginAlert');
     alert.style.visibility = 'visible';
+
     setTimeout(() => {
       alert.style.visibility = 'hidden';
     }, 2000);
@@ -165,32 +161,30 @@ export default function NavBar() {
 
   return (
     <nav>
-      <div className='navbar-align'>
-        <div className="menu" id="menu">
+      <div className="menu" id="menu">
 
-          <a className="menu-icon" onClick={openResponsiveMenu}>
-            <FontAwesomeIcon icon={faBars} />
-          </a>
+        <span id='menuBtn' onClick={openResponsiveMenu}>
+          <FontAwesomeIcon icon={faBars} />
+        </span>
 
-          <div className="menu-item" onClick={goHome}>
-            <a><FontAwesomeIcon icon={faHome} /> Inicio </a>
-          </div>
+        <span onClick={goHome}>
+          <FontAwesomeIcon icon={faHome} /> Inicio 
+        </span>
 
-          {ABOUT()}
+        {ABOUT()}
 
-          {FAQ()}
+        {FAQ()}
 
-          {Contacts()}
+        {Contacts()}
 
-          {Notes()}
+        {Notes()}
 
-          {Projects()}
+        {Projects()}
 
-          {Sites()}
+        {Sites()}
 
-          {LOGIN()}
+        {LOGIN()}
 
-        </div>
       </div>
     </nav>
   )

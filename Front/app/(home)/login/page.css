@@ -1,17 +1,19 @@
-.login-div {
+.login-page {
   display: block;
   max-width: 460px;
   margin: 4vh auto;
   padding: 2vh 1vw;
   height: 80vh;
-  background-image: var(--background);
   box-shadow: var(--shadow);
   border: 5px solid var(--color_accent);
+}
+
+.login-div {
   display: flex;
   flex-direction: column;
 }
 
-.login-title {
+.login-page h2 {
   color: var(--color_accent);
   font-weight: bold;
   font-size: clamp(1.2em, 3vw, 1.8em);
@@ -31,7 +33,7 @@
   font-size: clamp(0.9em, 2vw, 1.2em);
 }
 
-.login-link {
+.login-page p {
   font-size: clamp(0.8em, 1.5vw, 1em);
   margin: 1vh auto 0;
   color: var(--fontColor_pri);
@@ -40,8 +42,6 @@
 }
 
 .align-input {
-  width: auto;
-  height: auto;
   padding: 1vh 0;
 }
 
@@ -92,7 +92,7 @@
   font-size: 4em;
 }
 
-.login-tip {
+.login-page h3 {
   font-size: clamp(0.8em, 1.5vw, 1em);
   font-weight: bold;
   color: var(--fontColor_pri);

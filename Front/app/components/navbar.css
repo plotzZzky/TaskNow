@@ -5,20 +5,18 @@ nav {
   background-color: var(--color_dark);
 }
 
-.navbar-align {
-  margin: 2px 0;
-  display: flex;
-  justify-content: space-between;
-}
-
 .menu {
   display: flex;
 }
 
-.menu-item {
+.menu * {
+  color: var(--fontColor_sec);
+}
+
+.menu span {
   padding: 1vh 1vw;
   margin: 0 0.5vw;
-  color: var(--color_accent);
+  color: var(--fontColor_sec);
   text-align: center;
   cursor: pointer;
   position: relative;
@@ -26,11 +24,7 @@ nav {
   font-size: clamp(0.9, 2vw, 1.1em);
 }
 
-.menu-item * {
-  color: var(--fontColor_sec);
-}
-
-.menu-item::before {
+.menu span::before {
   content: '';
   position: absolute;
   inset: 4px; 
@@ -42,61 +36,28 @@ nav {
   border-radius: 4px;
 }
 
-.menu-item:hover::before {
+.menu span:hover::before {
   transform-origin: top;
   transform: scaleX(1);
 }
 
-.menu-icon {
+#menuBtn {
   display: none;
-  width: 32px;
-  height: 28px;
-  padding: 5px 2px 0;
-  position: relative;
-  cursor: pointer;
 }
 
-.menu-icon * {
-  color: var(--fontColor_sec);
-}
-
-.menu-icon::before {
-  content: '';
-  position: absolute;
-  inset: 4px 4px 4px -10px;
-  transform-origin: left;
-  transform: scaleX(0);
-  transition: transform .2s ease-in-out;
-  background-color: var(--color_accent);
-  z-index: -1;
-}
-
-.menu-icon:hover::before {
-  transform-origin: left;
-  transform: scaleX(1);
-}
-
-@media screen and (max-width: 1100px) {
-  .navbar-align {
-    width: 100%;
-    justify-content: left;
-  }
-
+@media screen and (max-width: 1200px) {
   .menu {
     flex-direction: column;
+    align-items: flex-start;
   }
 
-  .menu-item {
+  .menu span {
     display: none;
-    padding: 10px 2vw 4px;
-    margin: 0;
+    padding: 8px 2vw;
+    margin-left: -8px;
   }
 
-  .menu-item::before {
-    border-radius: 0;
-  }
-
-  .menu-icon {
+  #menuBtn {
     display: block;
   }
 
@@ -106,19 +67,18 @@ nav {
     align-items: flex-start;
   }
 
-  .menu.responsive .menu-item {
+  .menu.responsive span {
     display: block;
     text-align: left;
   }
 
-  .menu-item::before {
-    inset: 6px 0 2px;
+  .menu span::before {
     transform-origin: left;
     transform: scaleX(0);
     transition: transform .2s ease-in-out;
   }
   
-  .menu-item:hover::before {
+  .menu span:hover::before {
     transform-origin: left;
     transform: scaleX(1);
   }

@@ -163,7 +163,7 @@ class RecoveryPassword(ModelViewSet):
                     return Response({"msg": "Senha atualizada!"}, status=200)
                 else:
                     msg = "As senhas precisam ser iguais, no minimo uma letra, numero e 8 digitos!"
-                    return Response({"erro": msg}, status=500)
+                    return Response({"error": msg}, status=500)
             else:
                 raise ValueError()
         except (KeyError, ValueError, ObjectDoesNotExist):
