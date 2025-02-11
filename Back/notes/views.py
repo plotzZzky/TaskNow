@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
@@ -13,36 +14,32 @@ class NoteView(ModelViewSet):
     http_method_names = ['get', 'post', 'delete']
     serializer_class = NoteSerializer
 
-    def list(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
     def retrieve(self, request, *args, **kwargs):
         """ Retorna a lista com todas as notas de um determinado board """
-        board_id = kwargs['pk']  # Id do board de notas
-        board = BoardModel.objects.get(pk=board_id)
-        query = NotesModel.objects.filter(board=board)
+        try:
+            board_id = kwargs['pk']  # Id do board de notas
+            board = BoardModel.objects.get(pk=board_id)
+            query = NotesModel.objects.filter(board=board)
 
-        serializer = self.get_serializer(query, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = self.get_serializer(query, many=True)
+            return Response(serializer.data, status.HTTP_200_OK)
+
+        except (KeyError, ValueError, TypeError, ObjectDoesNotExist):
+            return Response(status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
         """ Cria uma nova nota """
         try:
-            board_id = request.data['boardId']
-            board = BoardModel.objects.get(pk=board_id)
-            title = request.data.get('title', 'Nova Nota').title()
-            desc = request.data['desc'].capitalize()
-            date = datetime.date.today()
-            color = request.data.get('color', '#FFF')
-            NotesModel.objects.create(board=board, title=title, desc=desc, date=date, color=color)
+            serializer = NoteSerializer(request.data, many=False)
 
-            board = BoardModel.objects.get(pk=board_id)
-            query = NotesModel.objects.filter(board=board)
-            serializer = self.get_serializer(query, many=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status.HTTP_201_CREATED)
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(status.HTTP_400_BAD_REQUEST)
+
         except (KeyError, ValueError):
-            return Response({"text": "Formulario incorreto"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         """ Deleta a nota selecionada """
@@ -50,11 +47,16 @@ class NoteView(ModelViewSet):
             note_id = kwargs['pk']
             note = NotesModel.objects.get(pk=note_id)
             note.delete()
+            return Response(status.HTTP_200_OK)
 
-            board = BoardModel.objects.get(pk=note.board.id)
-            query = NotesModel.objects.filter(board=board)
-            serializer = self.get_serializer(query, many=True)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
         except (KeyError, ValueError, TypeError, NotesModel.DoesNotExist):  # type:ignore
             return Response({"error": "Não foi possivel deletar a nota!"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)

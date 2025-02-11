@@ -11,42 +11,51 @@ export default function Tasks() {
   const [token, updateToken] = useAuth();
   const router = useRouter();
   const urlParamters = useParams()
+
   const [getCards, setCards] = useState([])
+
   const [getTaskTitle, setTaskTitle] = useState('Nome da tarefa')
   const [getTaskDesc, setTaskDesc] = useState('Descrição da tarefa')
 
+  useEffect(() => {
+    checkLogin();
+  }, [])
+
   function checkLogin() {
-    if (token !== null && typeof token !== 'string') {
+    if (token === null) {
       router.push("/login/");
     }
-  }
+
+    getAllCards();
+  };
 
   function getAllCards() {
     // Busca as informações dos cards no back
-    checkLogin()
-    const taskId = urlParamters.id
+    const taskId = urlParamters.id;
     const url = `http://127.0.0.1:8000/tasks/${taskId}/`;
 
-    const data = {
+    const requestData = {
       method: 'GET',
       headers: { Authorization: 'Token ' + token },
     };
 
-    fetch(url, data)
+    fetch(url, requestData)
       .then((res) => res.json())
       .then((data) => {
         createCards(data);
-      });
+    });;
   }
 
-  function createCards(value) {
+  function createCards(tasks) {
     // Cria os cards das tarefas
-    setCards(
-      value.map((data, index) => (
-        <TaskCard key={index} data={data} createCards={createCards}></TaskCard>
-      ))
-    );
-  }
+    if (tasks) {
+      setCards(
+        tasks.map((data, index) => (
+          <TaskCard key={index} data={data} createCards={createCards}></TaskCard>
+        ))
+      );
+    };
+  };
 
   function createNewTask() {
     // Cria uma nova tarefa
@@ -61,7 +70,7 @@ export default function Tasks() {
       method: 'POST',
       body: form,
       headers: { Authorization: 'Token ' + token },
-    }
+    };
 
     fetch(url, header)
       .then((res) => res.json())
@@ -69,24 +78,19 @@ export default function Tasks() {
         setTaskTitle("Nome da tarefa")
         setTaskDesc("Descrição da tarefa")
         createCards(data)
-      })
-  }
+    });
+  };
 
-  function changeTaskTitle(event) {
-    setTaskTitle(event.target.value)
-  }
+  function handleTaskTitle(event) {
+    setTaskTitle(event.target.value);
+  };
 
-  function changeTaskDesc(event) {
-    setTaskDesc(event.target.value)
-  }
-
-  useEffect(() => {
-    getAllCards()
-  }, [])
-
+  function handleTaskDesc(event) {
+    setTaskDesc(event.target.value);
+  };
 
   return (
-    <div className="page">
+    <section>
       <h2> Suas Tarefas </h2>
 
       <div className="cards">
@@ -96,14 +100,14 @@ export default function Tasks() {
 
               <div className="card-row">
                 <FontAwesomeIcon className='card-big-btn' icon={faSquareCheck}/>
-                <input className="card-input card-title" onChange={changeTaskTitle} value={getTaskTitle}></input>
+                <input className="card-input card-title" onChange={handleTaskTitle} value={getTaskTitle}></input>
                 <div className="card-btns">
                   <FontAwesomeIcon icon={faFloppyDisk} onClick={createNewTask} className='card-btn'/>
                 </div>
               </div>
 
               <div className="card-row">
-                <textarea className="card-input" onChange={changeTaskDesc} value={getTaskDesc}></textarea>
+                <textarea className="card-input" onChange={handleTaskDesc} value={getTaskDesc}></textarea>
               </div>
 
           </div>
@@ -112,6 +116,6 @@ export default function Tasks() {
         {getCards}
 
       </div>
-    </div>
+    </section>
   )
 }

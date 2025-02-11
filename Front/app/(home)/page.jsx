@@ -9,9 +9,6 @@ export default function Home() {
   const [Token, updateToken] = useAuth();
   const router = useRouter();
 
-  const ABOUT = `Simplifique sua vida com o TaskNow - a plataforma tudo-em-um para gerenciar tarefas. 
-  Organize, priorize e colabore de forma eficaz para alcançar seus objetivos com facilidade e praticidade.`
-
   const FAQ = [
     {
       question: "Quais serviços tenho acesso no TaskNow?",
@@ -47,37 +44,37 @@ export default function Home() {
     },
   ];
 
-  // Cria os items do faq
   const faqItems = () => {
-    return FAQ.map((data, index) => (
+    // Cria os items do faq
+    return FAQ.map(({question, answer}, index) => (
       <details className='details' key={index}>
-        <summary className='summary'> {data.question} </summary>
-        <a className='details-text'> {data.answer} </a>
+        <summary className='summary'> {question} </summary>
+        <a className='details-text'> {answer} </a>
       </details>
-    ))
-  }
+    ));
+  };
 
-  // Redireciona para a pagina do app ou login
   function goToLogin() {
-    if (Token !== null && typeof Token === 'string') {
+    // Redireciona para a pagina do app ou login
+    if (Token !== null) {
       router.push("/tasks");
     } else {
       router.push("/login");
-    }
-  }
+    };
+  };
 
   return (
-    <div>
-      <div className='page-home banner' id='Start'>
+    <>
+      <section className='banner' id='Start'>
         <h1 className='big-title'> TaskNow <FontAwesomeIcon icon={faCheckSquare} className='market-icon' /> </h1>
-        <h2 className='subtitle'> O jeito fácil de gerenciar sua vida. </h2>
+        <h2 className='subtitle'> O jeito fácil de gerenciar sua vida.</h2>
 
         <div className='home-align-btns'>
           <button onClick={goToLogin}> Começar agora! </button>
         </div>
-      </div>
+      </section>
 
-      <div className='page-home' id='About'>
+      <section id='About'>
         <h1> Sobre o TaskNow... </h1>
         <h2> Simplifique sua vida com o TaskNow - a plataforma tudo-em-um para gerenciar tarefas. </h2> 
         <h2> Crie, organize, priorize de forma eficaz suas tarefas para alcançar seus objetivos com facilidade e praticidade. </h2>
@@ -89,12 +86,12 @@ export default function Home() {
         <p> - BackUp de suas notas para não perder nada</p>
         <p> - Reduz seu impacto ambiental salvando suas ideias sem gastar papel </p>
 
-      </div>
+      </section>
 
-      <div className='page-home' id='Faq'>
+      <section id='Faq'>
         <h1> Duvias frequentes: </h1>
         {faqItems()}
-      </div>
-    </div>
+      </section>
+    </>
   )
 }

@@ -1,69 +1,115 @@
-from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth.models import User
+from rest_framework.decorators import action, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password, check_password
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.hashers import make_password
 from django.db.utils import IntegrityError
-import os
 import imghdr
+import os
 
-from .validate import (validate_user, validate_password, validate_username, validate_email, validate_question,
-                       validate_answer)
 from .token import create_new_token
 from .models import Recovery
-from .serializer import UserSerializer, RecoverySerializer
+from .serializer import UserSerializer
+from .validate import validate_password, validate_answer
 
 
-class RegisterView(ModelViewSet):
-    """ Cria um novo usuario """
-    http_method_names = ['post']
+class UserView(ModelViewSet):
+    """
+        View de Registro de novos usuarios
+    """
     serializer_class = UserSerializer
     queryset = []
 
+    @permission_classes([IsAuthenticated])
+    def list(self, request, *args, **kwargs):
+        """ Retorna a o perfil do usuario """
+        try:
+            user = request.user
+            serializer = self.get_serializer(user, many=False, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except ObjectDoesNotExist:
+            return Response({'error': 'Usuario não existe!'}, status=status.HTTP_401_UNAUTHORIZED)
+
     def create(self, request, *args, **kwargs):
         try:
-            password = request.data['password']
-            pwd = request.data['pwd']
-            username = request.data['username']
-            email = request.data['email']
-            question = request.data['question']
-            answer = request.data['answer']
+            serializer = UserSerializer(request.data, many=False)
 
-            if validate_user(password, pwd, username, email):
-                user = User.objects.create(username=username, email=email)
+            if serializer.is_valid():
+                password = request.data['password']
+                user = serializer.save()
                 user.set_password(password)
                 user.save()
-                authenticate(username=username, password=password)
+
+                authenticate(username=user.username, password=password)
                 token = create_new_token(user)
+
+                answer = request.data['answer']
                 answer_hashed = make_password(answer)  # salva a respota ja protegida por hash
-                Recovery.objects.create(user=user, question=question, answer=answer_hashed)
-                return Response({"token": token.key}, status=status.HTTP_200_OK)
+
+                question = request.data['question']
+                image = request.data.get('image', None)
+                Recovery.objects.create(user=user, question=question, answer=answer_hashed, image=image)
+
+                return Response({"token": token.key}, status=200)
+
             else:
                 raise ValueError()
+
         except (AttributeError, KeyError, ValueError):
-            return Response({"msg": "Informações incorretas!"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "Informações incorretas!"}, status=status.HTTP_401_UNAUTHORIZED)
+
         except IntegrityError as error:
             if 'auth_user_username_key' in str(error):
                 field = 'Nome de usuario'
             else:
                 field = 'O e-mail'
             msg = f"{field} já existe e não pode ser cadastrado!"
-            return Response({"msg": msg}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": msg}, status=status.HTTP_400_BAD_REQUEST)
 
+    @permission_classes([IsAuthenticated])
+    def partial_update(self, request, *args, **kwargs):
+        try:
+            serializer = UserSerializer(request.data, many=False)
 
-class LoginView(ModelViewSet):
-    """
-        View de login
-    """
-    http_method_names = ['post']
-    serializer_class = UserSerializer
-    queryset = []
+            if serializer.is_valid():
+                # Verificar se necessario
+                image = request.data.get('image', None)
+                imghdr.what(None, image.read())
+                image_path = str(request.user.profile.image)
 
-    def create(self, request, *args, **kwargs):
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+
+            user = serializer.save()
+
+            try:
+                answer = request.data.get('answer', None)
+                new_answer = validate_answer(answer)
+                user = request.user
+                user.profile.answer = new_answer
+                user.profile.save()
+            except KeyError:
+                pass
+
+            password = request.data.get('password', "")
+            pwd = request.data.get('pwd', "")
+            if password == pwd:
+                if validate_password(password, pwd):
+                    user.set_password(password)
+
+            user.save()
+            return Response({"msg": "Dados atualizados!"}, status=status.HTTP_200_OK)
+
+        except (KeyError, ValueError, ObjectDoesNotExist):
+            return Response({"msg": "Não foi possivel atualizar!"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=["POST"], url_path="login")
+    def login(self, request, *args, **kwargs):
         try:
             password = request.data['password']
             username = request.data['username']
@@ -77,86 +123,27 @@ class LoginView(ModelViewSet):
         except (KeyError, ValueError):
             return Response({"error": "Login incorreto"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-class UpdateProfile(ModelViewSet):
-    """
-        Atualiza o perfil do usuario
-    """
-    http_method_names = ['patch']
-    permission_classes = [IsAuthenticated]
-    queryset = []
-    serializer_class = UserSerializer
-
-    def partial_update(self, request, *args, **kwargs):
+    @action(methods=["POST"], url_path="question")
+    def your_question(self, request, *args, **kwargs):
         try:
-            user = request.user
-            password = request.data.get('password', "")
-            pwd = request.data.get('pwd', "")
-            username = request.data.get('username', "")
-            email = request.data.get('email', "")
-            image = request.data.get('image', None)
-            question = request.data.get('question', None)
-            answer = request.data.get('answer', None)
+            username = request.data['username']
+            user = User.objects.get(username=username)
+            question = user.profile.question
+            return Response({"question": question}, status=status.HTTP_200_OK)
 
-            if image is not None:
-                imghdr.what(None, image.read())
-                image_path = str(user.profile.image)
-                if os.path.exists(image_path):
-                    os.remove(image_path)
-                user.profile.image = image
-            if validate_username(username):
-                user.username = username
-            if validate_email(email):
-                user.email = email
-            if validate_question(question):
-                user.profile.question = question
-            new_answer = validate_answer(answer)
-            if new_answer:
-                user.profile.answer = new_answer
-            if password == pwd:
-                if validate_password(password, pwd):
-                    user.set_password(password)
-            else:
-                user.save()
-                user.profile.save()
-                return Response({"msg": "As senhas não são iguais, mas os demais dados foram atualizados!"})
-            user.save()
-            user.profile.save()
-            return Response({"msg": "Dados atualizados!"}, status=status.HTTP_200_OK)
         except (KeyError, ValueError, ObjectDoesNotExist):
-            return Response({"msg": "Não foi possivel atualizar!"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Usuario não encontrado"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-class YourProfile(ModelViewSet):
-    """ Retorna um json com o perfil do usuario para atualizar o perfil """
-    permission_classes = [IsAuthenticated]
-    http_method_names = ['post']
-    queryset = []
-    serializer_class = UserSerializer
-
-    def list(self, request, *args, **kwargs):
-        try:
-            user = request.user
-            serializer = self.get_serializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist:
-            return Response({'error': 'Usuario não existe!'}, status=status.HTTP_401_UNAUTHORIZED)
-
-
-class RecoveryPassword(ModelViewSet):
-    # Recuperação da senha do usuario
-    http_method_names = ['post']
-    queryset = []
-    serializer_class = RecoverySerializer
-
-    def create(self, request, *args, **kwargs):
+    @action(methods=["POST"], url_path="recover")
+    def recover_pwd(self, request, *args, **kwargs):
         try:
             username = request.data['username']
             answer = request.data['answer']
             password = request.data['password']
             pwd = request.data['pwd']
             user = User.objects.get(username=username)
-            if check_password(answer, user.recovery.answer):
+
+            if check_password(answer, user.profile.answer):
                 if validate_password(password, pwd):
                     user.set_password(password)
                     user.save()
@@ -170,17 +157,11 @@ class RecoveryPassword(ModelViewSet):
             return Response({"error": "Resposta incorreta!"}, status=500)
 
 
-class ReceiverYourQuestion(ModelViewSet):
-    # Envia a question do usuario para o front para fazer a recuperação de senha
-    http_method_names = ['post']
-    serializer_class = UserSerializer
-    queryset = []
+    def update(self, request, *args, **kwargs):
+        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def create(self, request, *args, **kwargs):
-        try:
-            username = request.data['username']
-            user = User.objects.get(username=username)
-            question = user.recovery.question
-            return Response({"question": question}, status=status.HTTP_200_OK)
-        except (KeyError, ValueError, ObjectDoesNotExist):
-            return Response({"error": "Usuario não encontrado"}, status=status.HTTP_400_BAD_REQUEST)
+    def destroy(self, request, *args, **kwargs):
+        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)

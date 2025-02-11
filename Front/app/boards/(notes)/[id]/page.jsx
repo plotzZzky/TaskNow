@@ -18,28 +18,31 @@ export default function Notes() {
   const [getDesc, setDesc] = useState('Nota de teste');
   const [getColor, setColor] = useState('rgb(182, 253, 206)');
 
-  function checkLogin() {
-    if (Token !== null && typeof Token === 'string') {
-      getAllNotes()
-    } else {
-      router.push("/login/");
-    }
-  }
+  useEffect(() => {
+    checkLogin()
+  }, []);
 
-  // Notes
+  function checkLogin() {
+    if (Token === null) {
+      router.push("/login/");
+    };
+
+    getAllNotes();
+  };
+
   function getAllNotes() {
-    const boardId = urlParamters.id
-    const url = `http://127.0.0.1:8000/notes/${boardId}/`
-    const data = {
+    const boardId = urlParamters.id;
+    const url = `http://127.0.0.1:8000/notes/${boardId}/`;
+
+    const requestData = {
       method: 'GET',
       headers: { Authorization: 'Token ' + Token}
-    }
-    fetch(url, data)
+    };
+
+    fetch(url, requestData)
       .then((res) => res.json())
-      .then((data) => { 
-        createNotesCard(data) 
-      })
-  }
+      .then((data) => { createNotesCard(data) });
+  };
 
   function createNotesCard(notes) {
     if (notes) {
@@ -47,84 +50,80 @@ export default function Notes() {
         notes.map((data) => (
           <NoteCard key={data.id} data={data} update={getAllNotes}></NoteCard>))
       )
-    } else {
-      router.push("/login")
-    }
-  }
+    };
+  };
 
   function saveNewNote() {
     const url = "http://127.0.0.1:8000/notes/"
+
     const form = new FormData();
     form.append("boardId", urlParamters.id);
     form.append("title", getTitle);
     form.append("desc", getDesc);
     form.append("color", getColor)
 
-    const data = {
+    const requestData = {
       method: 'POST',
       headers: { Authorization: 'Token ' + Token },
       body: form
-    }
+    };
 
-    fetch(url, data)
+    fetch(url, requestData)
       .then((res) => res.json())
       .then((data) => {
-        setFormDefault();
+        setFormToDefault();
         createNotesCard(data)
-      });
-  }
+    });
+  };
 
   // retorna os valores do form para os padrão
-  function setFormDefault() {
-    setTitle('Titulo da nota')
-    setDesc('Nota de teste')
-    setColor('')
-    document.getElementById("TitleInput").innerText = getTitle
-  }
+  function setFormToDefault() {
+    setTitle('Titulo da nota');
+    setDesc('Nota de teste');
+    setColor('');
+    document.getElementById("TitleInput").innerText = getTitle;
+  };
 
   // Sets
-  function changeTitle(event) {
+  function handleTitle(event) {
     const value = event.target.value
     setTitle(value)
   }
 
-  function changeText(event) {
+  function handleText(event) {
     const value = event.target.value
     setDesc(value)
   }
 
-  function changeColor(event) {
+  function handleColor(event) {
     const value = event.target.value
     setColor(value)
   }
 
-  useEffect(() => {
-    checkLogin()
-  }, []);
-
 
   return (
-    <>
-      <div className="page">
-        <div className="cards">
-          <div className="note-margin">
-            <div className='note-card' style={{'background': getColor}}> 
-              <input className='card-input card-title' id="TitleInput" value={getTitle} onChange={changeTitle}></input>
-              
-              <textarea 
-                className='note-text' id="TextInput" wrap="hard" onChange={changeText} value={getDesc}>
-              </textarea>
+    <section>
+      <div className="cards">
+        
+        <div className="note-margin">
+          <div className='note-card' style={{'background': getColor}}> 
+            <input className='card-input card-title' id="TitleInput" value={getTitle} onChange={handleTitle}></input>
+            
+            <textarea 
+              className='note-text' id="TextInput" wrap="hard" onChange={handleText} value={getDesc}>
+            </textarea>
 
-              <div className='card-row'>
-                <FontAwesomeIcon icon={faFloppyDisk} onClick={saveNewNote} className='card-btn'/>
-                <input type="Color" className="color-select" onChange={changeColor}></input>
-              </div>
+            <div className='card-row'>
+              <FontAwesomeIcon icon={faFloppyDisk} onClick={saveNewNote} className='card-btn'/>
+
+              <input type="Color" className="color-select" onChange={handleColor}></input>
             </div>
           </div>
-
-          {getNotesCard}
         </div>
+
+        {getNotesCard}
+
       </div>
-    </>
+    </section>
   )
 }

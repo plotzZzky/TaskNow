@@ -27,63 +27,70 @@ export default function Login() {
     router.push('/login');
   };
 
-  // Função para verificar se o usuario terminou de digitar o username e então buscar a question
+
   function receiveQuestionTimer (value) {
-    // Timer para buscar o username
-    let timerId;
+    // Função para verificar se o usuario terminou de digitar o username e então buscar a question
+    let timerId; // Timer para buscar o username
     clearTimeout(timerId);
     timerId = setTimeout(() => {
       receiveQuestion(value);
     }, 1000);
-  }
+  };
 
-  // Função que busca a question do usuario para recuperar a senha
   function receiveQuestion(value) {
-    const url = 'http://127.0.0.1:8000/users/question/'
+    // Função que busca a question do usuario para recuperar a senha
+    const url = 'http://127.0.0.1:8000/users/question/';
 
-    const formData = new FormData();
-    formData.append("username", value || getUsername)
-    const requestData = {method: 'POST', body: formData}
+    const form = new FormData();
+    form.append("username", value || getUsername)
+
+    const requestData = {
+      method: 'POST',
+      body: form
+    };
 
     fetch(url, requestData)
     .then((res) => res.json())
     .then((data) => {
       if (data.msg) {
-        const tip = document.getElementById("recoveryTip")
-        tip.innerText = data.msg
+        const tip = document.getElementById("recoveryTip");
+        tip.innerText = data.msg;
       } else {
-        setQuestion(data['question'])
-        setVisibility(true)
+        setQuestion(data['question']);
+        setVisibility(true);
       }
-    })
+    });
   };
 
   // Função de recuperação de senha
   function recoveyFunc() {
-    const url = 'http://127.0.0.1:8000/users/recovery/'
+    const url = 'http://127.0.0.1:8000/users/recovery/';
 
-    const formData = new FormData();
-    formData.append("username", getUsername);
-    formData.append("answer", getAnswer);
-    formData.append("password", getPassword);
-    formData.append("pwd", getpwd);
+    const form = new FormData();
+    form.append("username", getUsername);
+    form.append("answer", getAnswer);
+    form.append("password", getPassword);
+    form.append("pwd", getpwd);
 
-    const requestData = {method: 'POST', body: formData}
+    const requestData = {
+      method: 'POST',
+      body: form
+    };
 
     fetch(url, requestData)
     .then((res) => res.json())
     .then((data) => {
       if (data.error) {
-        const tip = document.getElementById("recoveryTip")
-        tip.innerText = data.error
+        const tip = document.getElementById("recoveryTip");
+        tip.innerText = data.error;
       } else {
         router.push('/login');
       }
-    })
-  }
+    });
+  };
 
   return (
-    <>
+    <section>
       <div className='page banner'>
         <div className="login-page">
           <div className="login-alert" id='loginAlert'>
@@ -115,6 +122,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </>
+    </section>
   )
 }

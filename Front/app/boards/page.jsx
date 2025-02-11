@@ -10,41 +10,48 @@ import BoardCard from "@comps/notes/boardCard";
 export default function Boards() {
   const [Token, updateToken] = useAuth();
   const router = useRouter();
+
   const [getCards, setCards] = useState([])
+
   const [getBoardTitle, setBoardTitle] = useState('Nome do quadro')
   const [getBoardDesc, setBoardDesc] = useState('Descrição do quadro')
 
+  useEffect(() => {
+    checkLogin();
+  }, [])
+
   function checkLogin() {
-    if (Token !== null && typeof Token !== 'string') {
+    if (Token === null) {
       router.push("/login/");
-    }
-  }
+    };
+
+    getAllBoards();
+  };
 
   function getAllBoards() {
     // Busca as informações dos cards no back
-    checkLogin()
     const url = "http://127.0.0.1:8000/boards/";
 
-    const data = {
+    const requestData = {
       method: 'GET',
       headers: { Authorization: 'Token ' + Token },
     };
 
-    fetch(url, data)
+    fetch(url, requestData)
       .then((res) => res.json())
-      .then((data) => {
-        createCards(data);
-      });
-  }
+      .then((data) => { createCards(data) });
+  };
 
-  function createCards(value) {
+  function createCards(boards) {
     // Cria os cards das tarefas
-    setCards(
-      value.map((data, index) => (
-        <BoardCard key={index} data={data} getAllCards={getAllBoards}></BoardCard>
-      ))
-    );
-  }
+    if (boards) {
+      setCards(
+        boards.map((data, index) => (
+          <BoardCard key={index} data={data} getAllCards={getAllBoards}></BoardCard>
+        ))
+      );
+    };
+  };
 
   function createNewBoard() {
     // Cria uma nova tarefa
@@ -54,36 +61,32 @@ export default function Boards() {
     form.append("title", getBoardTitle)
     form.append("desc", getBoardDesc)
 
-    const header = {
+    const requestData = {
       method: 'POST',
       body: form,
       headers: { Authorization: 'Token ' + Token },
-    }
+    };
 
-    fetch(url, header)
+    fetch(url, requestData)
       .then((res) => res.json())
       .then((data) => {
         setBoardTitle("Nome da tarefa")
         setBoardDesc("Descrição da tarefa")
         createCards(data)
-      })
-  }
+    });
+  };
 
-  function changeBoardTitle(event) {
-    setBoardTitle(event.target.value)
-  }
+  function handleBoardTitle(event) {
+    setBoardTitle(event.target.value);
+  };
 
-  function changeBoardDesc(event) {
-    setBoardDesc(event.target.value)
-  }
-
-  useEffect(() => {
-    getAllBoards()
-  }, [])
+  function handleBoardDesc(event) {
+    setBoardDesc(event.target.value);
+  };
 
 
   return (
-    <div className="page">
+    <section>
       <h2> Seus quadros de notas </h2>
       <div className="cards">
       
@@ -91,7 +94,8 @@ export default function Boards() {
           <div className="card">
               <div className="card-row">
                 <FontAwesomeIcon className='card-big-btn' icon={faNoteSticky}/>
-                <input className="card-input card-title" onChange={changeBoardTitle} value={getBoardTitle}></input>
+                
+                <input className="card-input card-title" onChange={handleBoardTitle} value={getBoardTitle}></input>
 
                 <div className="card-btns">
                   <FontAwesomeIcon icon={faFloppyDisk} onClick={createNewBoard} className='card-btn'/>
@@ -99,7 +103,7 @@ export default function Boards() {
               </div>
 
               <div className="card-row">
-                <textarea className="card-input" onChange={changeBoardDesc} value={getBoardDesc}></textarea>
+                <textarea className="card-input" onChange={handleBoardDesc} value={getBoardDesc}></textarea>
               </div>
           </div>
         </div>
@@ -107,6 +111,6 @@ export default function Boards() {
         {getCards}
 
       </div>
-    </div>
+    </section>
   )
 }

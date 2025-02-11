@@ -18,23 +18,17 @@ class WebsiteView(ModelViewSet):
         serializer = self.get_serializer(query, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def retrieve(self, request, *args, **kwargs):
-        """ Desativado por não usado """
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
     def create(self, request, *args, **kwargs):
         """ Cria um novo website """
         try:
-            title = request.data.get('title', 'Novo site')
-            url = request.data['url']
-            color = request.data.get('color', '#FFFFFF')
-            user = request.user
-            WebsiteModel.objects.create(user=user, title=title, url=url, color=color)
+            serialize = WebSiteSerializer(request.data, many=False)
 
-            query = WebsiteModel.objects.filter(user=request.user)
-            serializer = self.get_serializer(query, many=True)
+            if serialize.is_valid():
+                serialize.save()
+                return Response(status.HTTP_201_CREATED)
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(status.HTTP_400_BAD_REQUEST)
+
         except (KeyError, ValueError):
             return Response({"text": "Formulario incorreto"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -44,9 +38,16 @@ class WebsiteView(ModelViewSet):
             website = WebsiteModel.objects.get(pk=website_id)
             website.delete()
 
-            query = WebsiteModel.objects.filter(user=request.user)
-            serializer = self.get_serializer(query, many=True)
+            return Response(status.HTTP_200_OK)
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
         except (ValueError, KeyError, TypeError, WebsiteModel.DoesNotExist):  # type:ignore
             return Response({"error": "Website não encontrado"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)

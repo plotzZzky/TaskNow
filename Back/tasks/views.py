@@ -1,3 +1,4 @@
+from django.core.serializers import serialize
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -14,10 +15,6 @@ class TaskViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = TaskSerializer
 
-    def list(self, request, *args, **kwargs):
-        """ Desativado por ser necessario """
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
     def retrieve(self, request, *args, **kwargs):
         """ Retorna a lista com todas as tarefas do projeto atual """
         project_id = kwargs['pk']
@@ -31,34 +28,23 @@ class TaskViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         """ Cria uma nova tarefa """
         try:
-            project_id = request.data['projectId']
-            project = ProjectModel.objects.get(pk=project_id)
-            title = request.data['title']
-            desc = request.data.get('desc', '')
-            TaskModel.objects.create(project=project, title=title, desc=desc, status=1)
+            serializer = TaskSerializer(request.data, many=False)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status.HTTP_201_CREATED)
 
-            project = ProjectModel.objects.get(pk=project_id)  # Id do projeto com as tarefas
-            query = TaskModel.objects.filter(project=project)
-            serializer = self.get_serializer(query, many=True)
-            items = sorted(serializer.data, key=sorted_by_status)
+            return Response(status.HTTP_400_BAD_REQUEST)
 
-            return Response(items, status=status.HTTP_200_OK)
-        except KeyError:
+        except (KeyError, ValueError, TypeError):
             return Response({"msg": "Não foi possivel criar a tarefa!"}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         """ Deleta um tarefa """
         try:
-            task_id = kwargs['pk']
-            task = TaskModel.objects.get(pk=task_id)
+            task = self.get_object()
             task.delete()
+            return Response(status.HTTP_200_OK)
 
-            project = ProjectModel.objects.get(pk=task.project.id)  # Id do projeto com as tarefas
-            query = TaskModel.objects.filter(project=project)
-            serializer = self.get_serializer(query, many=True)
-            items = sorted(serializer.data, key=sorted_by_status)
-
-            return Response(items, status=status.HTTP_200_OK)
         except (KeyError, ValueError, TypeError, TaskModel.DoesNotExist):  # type:ignore
             return Response({"error": "Tarefa não econtrada"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -72,14 +58,15 @@ class TaskViewSet(ModelViewSet):
                 task.status = task_status
                 task.save()
 
-            project = ProjectModel.objects.get(pk=task.project.id)  # Id do projeto com as tarefas
-            query = TaskModel.objects.filter(project=project)
-            serializer = self.get_serializer(query, many=True)
-            items = sorted(serializer.data, key=sorted_by_status)
-
-            return Response(items, status=status.HTTP_200_OK)
+            return Response(status.HTTP_200_OK)
         except (KeyError, TypeError):
             return Response({"error": "Valores invalidos"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class CommentViewSet(ModelViewSet):
@@ -98,27 +85,22 @@ class CommentViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         """ Cria um novo comentario na tarefa atual """
         try:
-            task_id = request.data['taskId']
-            text = request.data['comment']
-            task = TaskModel.objects.get(pk=task_id)
-            CommentModel.objects.create(task=task, text=text)
-            task = TaskModel.objects.get(pk=task_id)
-            serializer = CommentSerializer(task.comments.all(), many=True)
+            serializer = TaskSerializer(request.data, many=False)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status.HTTP_201_CREATED)
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(status.HTTP_400_BAD_REQUEST)
+
         except (KeyError, ValueError):
-            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         """ Deleta um comentario selecionado """
         try:
-            comment_id = kwargs['pk']
-            comment = CommentModel.objects.get(pk=comment_id)
+            comment = self.get_object()
             comment.delete()
-            task_id = comment.task.id
-            task = TaskModel.objects.get(pk=task_id)
-            serializer = CommentSerializer(task.comments.all(), many=True)
+            return Response(status.HTTP_200_OK)
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
         except (KeyError, ValueError, CommentModel.DoesNotExist):   # type: ignore
             return Response({}, status=status.HTTP_400_BAD_REQUEST)

@@ -15,37 +15,40 @@ export default function Contacts() {
   const [getText, setText] = useState('Nota de test');
   const [getColor, setColor] = useState("");
 
-  function checkLogin() {
-    if (Token !== null && typeof Token === 'string') {
-      getAllContacts()
-    } else {
-      router.push("/login/");
-    }
-  }
-
-  // Contacts
-  function getAllContacts() {
-    let url = "http://127.0.0.1:8000/contacts/"
-    let data = {
-      method: 'GET',
-      headers: { Authorization: 'Token ' + Token}
-    }
-    fetch(url, data)
-      .then((res) => res.json())
-      .then((data) => { createContactsCard(data) }
-      )
-  }
-
-  function createContactsCard(contacts) {
-    setContactsCard(
-      contacts.map((data) => (
-        <ContactCard key={data.id} data={data} createCard={createContactsCard} ></ContactCard>))
-    )
-  }
-
   useEffect(() => {
     checkLogin()
   }, []);
+ 
+  function checkLogin() {
+    if (Token === null) {
+      router.push("/login")
+    };
+
+    getAllContacts();
+  };
+
+  function getAllContacts() {
+    const url = "http://127.0.0.1:8000/contacts/"
+
+    const requestData = {
+      method: 'GET',
+      headers: { Authorization: 'Token ' + Token}
+    };
+
+    fetch(url, requestData)
+      .then((res) => res.json())
+      .then((data) => { createContactsCard(data) }
+    );
+  };
+
+  function createContactsCard(contacts) {
+    if (contacts) {
+      setContactsCard(
+        contacts.map((data) => (
+          <ContactCard key={data.id} data={data} createCard={createContactsCard} ></ContactCard>))
+      );
+    };
+  };
 
 
   return (
