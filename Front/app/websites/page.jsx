@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from '@comps/authContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEarthAmerica, faEarthEurope, faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
+import { faEarthAmerica, faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
 import SiteCard from "@comps/siteCard";
 
 export default function Sites() {
@@ -17,17 +17,8 @@ export default function Sites() {
   const [getColor, setColor] = useState("");
 
   useEffect(() => {
-    checkLogin()
-  }, []);
-
-  function checkLogin() {
-    if (Token === null) {
-      router.push("/login/");
-    };
-
     getAllSites();
-  };
-
+  }, []);
 
   function getAllSites() {
     const url = "http://127.0.0.1:8000/websites/"
@@ -49,7 +40,7 @@ export default function Sites() {
         sites.map((data) => (
           <SiteCard key={index} data={data} createCards={createSitesCard} />))
       )
-    }
+    };
   };
 
   function createNewSite() {
@@ -73,7 +64,6 @@ export default function Sites() {
         createSitesCard(data);
     });
   };
-
 
   function setFormDefault() {
     // retorna os valores do form para os padrão

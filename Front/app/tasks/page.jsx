@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from '@comps/authContext'
+import { retriveItemFromSessionStorage } from "@omps/ss";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFloppyDisk, faSquareCheck } from '@fortawesome/free-solid-svg-icons'
 import ProjectCard from "@comps/tasks/projectCard";
@@ -11,30 +12,34 @@ export default function Projects() {
   const [token, updateToken] = useAuth();
   const router = useRouter();
 
-  const [getCards, setCards] = useState([])
+  const [getCards, setCards] = useState([]);
 
-  const [getTaskTitle, setTaskTitle] = useState('Nome do projeto')
-  const [getTaskDesc, setTaskDesc] = useState('Descrição do projeto')
+  const [getTaskTitle, setTaskTitle] = useState('Nome do projeto');
+  const [getTaskDesc, setTaskDesc] = useState('Descrição do projeto');
 
   useEffect(() => {
-    checkLogin
+    loadProjects();
   }, [])
 
-  function checkLogin() {
-    if (token === null) {
-      router.push("/login/");
-    }
+  function loadProjects() {
+    const cached = retriveItemFromSessionStorage("projects");
 
-    getAllCards();
+    if (cached) {
+      createCards(cached);
+    } else {
+      getProjectsOnBack();
+    };
   };
 
-  function getAllCards() {
+  function getProjectsOnBack() {
     // Busca as informações dos cards no back
-    const url = "http://127.0.0.1:8000/projects/";
+    const url = process.env("BACK_PROJECTS_URL");
 
     const requestData = {
       method: 'GET',
-      headers: { Authorization: 'Token ' + token },
+      headers: {
+        Authorization: 'Token ' + token
+      },
     };
 
     fetch(url, requestData)
@@ -48,10 +53,9 @@ export default function Projects() {
     // Cria os cards dos projetos
     if (projects) {
       setCards(
-        projects.map((data, index) => (
-          <ProjectCard key={index} data={data} createCards={createCards}></ProjectCard>
-        ))
-      );
+        projects.map(({title, desc}, index) => (
+          <ProjectCard key={index} title={title} desc={desc} createCards={createCards} />
+      )));
     };
   };
 
@@ -96,6 +100,7 @@ export default function Projects() {
 
               <div className="card-row">
                 <FontAwesomeIcon className='card-big-btn' icon={faSquareCheck}/>
+
                 <input className="card-input card-title" onChange={handleProjectTitle} value={getTaskTitle}></input>
 
                 <div className="card-btns"> 

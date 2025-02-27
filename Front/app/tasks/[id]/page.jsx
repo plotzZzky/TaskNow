@@ -18,16 +18,8 @@ export default function Tasks() {
   const [getTaskDesc, setTaskDesc] = useState('Descrição da tarefa')
 
   useEffect(() => {
-    checkLogin();
-  }, [])
-
-  function checkLogin() {
-    if (token === null) {
-      router.push("/login/");
-    }
-
     getAllCards();
-  };
+  }, [])
 
   function getAllCards() {
     // Busca as informações dos cards no back

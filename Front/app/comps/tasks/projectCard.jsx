@@ -34,14 +34,14 @@ export default function ProjectCard(props) {
     <div className="margin" onClick={openProject}>
       <div className="card click">
         <div className='card-row'>
-          <span className="card-title">{props.data.title}</span>
+          <span className="card-title">{props.title}</span>
 
           <div className='card-btns'>
             <FontAwesomeIcon icon={faTrash} onClick={e => deleteProject(e)} className='card-btn'/>
           </div>
         </div>
 
-        <textarea disabled className="card-input" value={props.data.desc} ></textarea>
+        <textarea disabled className="card-input" value={props.desc} ></textarea>
       </div>
     </div>
   )

@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from '@comps/authContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFloppyDisk, faNoteSticky } from '@fortawesome/free-solid-svg-icons'
@@ -9,7 +8,6 @@ import BoardCard from "@comps/notes/boardCard";
 
 export default function Boards() {
   const [Token, updateToken] = useAuth();
-  const router = useRouter();
 
   const [getCards, setCards] = useState([])
 
@@ -17,16 +15,8 @@ export default function Boards() {
   const [getBoardDesc, setBoardDesc] = useState('Descrição do quadro')
 
   useEffect(() => {
-    checkLogin();
-  }, [])
-
-  function checkLogin() {
-    if (Token === null) {
-      router.push("/login/");
-    };
-
     getAllBoards();
-  };
+  }, [])
 
   function getAllBoards() {
     // Busca as informações dos cards no back

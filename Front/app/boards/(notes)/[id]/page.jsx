@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useAuth } from '@comps/authContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons'
@@ -9,7 +9,6 @@ import NoteCard from '@comps/notes/noteCard'
 
 export default function Notes() {
   const [Token, updateToken] = useAuth();
-  const router = useRouter();
   const urlParamters = useParams()
 
   const [getNotesCard, setNotesCard] = useState([]);
@@ -19,16 +18,8 @@ export default function Notes() {
   const [getColor, setColor] = useState('rgb(182, 253, 206)');
 
   useEffect(() => {
-    checkLogin()
-  }, []);
-
-  function checkLogin() {
-    if (Token === null) {
-      router.push("/login/");
-    };
-
     getAllNotes();
-  };
+  }, []);
 
   function getAllNotes() {
     const boardId = urlParamters.id;
