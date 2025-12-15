@@ -1,9 +1,9 @@
 'use client'
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import InputPwd from '@comps/inputs/inputPwd';
-import InputUser from '@comps/inputs/inputUser';
-import InputAnswer from '@comps/inputs/inputAnswer';
+import InputPwd from '@/app/antigos/inputs/inputPwd';
+import InputUser from '@/app/antigos/inputs/inputUser';
+import InputAnswer from '@/app/antigos/inputs/inputAnswer';
 
 
 export default function Login() {

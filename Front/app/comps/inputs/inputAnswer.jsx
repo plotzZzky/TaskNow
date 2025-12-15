@@ -1,36 +1,29 @@
-import { useEffect } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faX, faCheck } from '@fortawesome/free-solid-svg-icons'
+import GenericInput from "./inputGeneric";
 
 
 export default function InputAnswer(props) {
-  function updateLoginTip() {
-    const tip = document.getElementById(props.tip)
-    tip.innerText = "A resposta deve ter mais de 3 digitos"
-  }
+  const toolTipData = "Digite a resposta para sua pergunta de recuperação de senha."
+  const placeholder = 'Digite a resposta para sua pergunta de recuperação';
+  const valueLength = 3;
 
-  const ValidAnswer = (event) => {
-    const value = event.target.value;
-    if (value.length > 3) {
-      props.setValid(true)
-    } else {
-      props.setValid(false)
-    }
-    props.answer(value)
-  }
-
+  function ValidateAnswer(value) {
+    props.setValid(
+      value.length > valueLength
+    );
+  };
 
   return (
-    <div className='div-input'>
-      <input className='text-input' type="text" placeholder='Sua resposta'
-        onChange={ValidAnswer} onFocus={updateLoginTip} >
-      </input>
-      <span className='input-div-icon'>
-        {props.valid ?
-          <FontAwesomeIcon icon={faCheck} className='icon-input-validate' /> :
-          <FontAwesomeIcon icon={faX} className='icon-input' />
-        }
-      </span>
-    </div>
+    <GenericInput 
+      value={props.value}
+      setValue={props.setValue}
+      valid={props.valid}
+      validate={ValidateAnswer}
+
+      type={"text"}
+      name={"answer"}
+      placeholder={placeholder}
+
+      toolTipData={toolTipData}
+    />
   )
 }

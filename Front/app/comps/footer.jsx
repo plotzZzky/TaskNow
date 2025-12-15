@@ -1,41 +1,41 @@
 'use client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons'
+import "@comps/footer.css"
+
 
 export default function Footer() {
+  const siteName = process.env.NEXT_PUBLIC_SITE_NAME;
+  const siteDesc = process.env.NEXT_PUBLIC_SITE_DESC;
+  
+  const emails = [
+    process.env.NEXT_PUBLIC_EMAIL,
+  ]
 
-  function goToGitHub() { router.push("https://github.com/plotzzzky") }
+  const EMAIL_LINKS = () => { // Cria os cards para cada e-mail de contato
+    return (
+      emails.map((email, index) => 
+        <p key={index}>
+          <FontAwesomeIcon icon={faEnvelope}/>
+          <a> {email} </a>
+        </p>
+      )
+    )
+  };
 
   return (
     <footer>
-      <div className='brand'>
-        <span className='brand-title'> TaskNow </span>
-        <span className='brand-name'> O jeito fácil de gerenciar sua vida. </span>
-      </div>
+      <header>
+        <h3>
+          {siteName}!
+        </h3>
 
+        <span>{siteDesc}</span>
+      </header>
 
-      <div className='contacts'>
-        <p> Contatos </p>
-
-        <p>
-          <FontAwesomeIcon icon={faEnvelope}/>
-          <a> contato@TaskNow.com </a>
-        </p>
-
-        <p>
-          <FontAwesomeIcon icon={faEnvelope}/>
-          <a> equipe@TaskNow.com </a>
-        </p>
-      </div>
-
-      <div className='contacts'>
-        <p> Dev </p>
-
-        <p onClick={goToGitHub}>
-          <FontAwesomeIcon icon={faGithub} />
-          <a> GitHub.com/plotzZzky </a>
-        </p>
+      <div>
+        <p> Contatos: </p>
+        {EMAIL_LINKS()}
       </div>
     </footer>
   )

@@ -1,191 +1,154 @@
 'use client'
-import { useRouter, usePathname } from 'next/navigation'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser, faBars, faHome, faQuestion, faUsers, faRightFromBracket, faCheckSquare, faNoteSticky, faGlobeEurope } from '@fortawesome/free-solid-svg-icons'
+import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { useAuth } from './authContext'
+import { useGenericGoPage} from '@hooks/useGoPage'
+import { useGoLoginPage } from './hooks/useGoLogin'
+import { useGenericGoLogout } from './hooks/useLogout'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Tooltip } from 'react-tooltip'
+import { faUser, faHome, faQuestion, faUsers, faRightFromBracket, faImage } from '@fortawesome/free-solid-svg-icons'
 import './navbar.css'
 
-export default function NavBar() {
-  const [getToken, setToken] = useAuth();
-  const router = useRouter();
-  const getPath = usePathname();
 
-  function openResponsiveMenu() {
-    // Função que abre o menu no modo responsivo
-    const navbar = document.getElementById("menu");
-    if (navbar.className == "menu") {
-      navbar.classList.add("responsive");
+export default function NavBar() {
+  const [isClient, setIsClient] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const pathname = usePathname();
+  const goLoginPage = useGoLoginPage();
+  const goPage = useGenericGoPage();
+  const goLogout = useGenericGoLogout();
+
+  useEffect(() => {
+    // Se executado indica estar no cliente
+    setIsClient(true) // Usado para evitar erros de api do navegador não disponivel
+  }, [])
+
+
+  // * * * Funções de navegação pelas paginas * * *
+  function goHomePage() {
+    if (pathname !== '/') {
+      goPage("HOME");
+
     } else {
-      navbar.className = "menu";
+      document.getElementById('Start').scrollIntoView();
     }
   };
 
-  function closeResponsiveMenu() {
-    // Função que fecha o menu no modo responsivo
-    const navbar = document.getElementById("menu");
-    navbar.classList.remove("responsive");
+  function goAboutPage() {
+    document.getElementById('About').scrollIntoView();
   };
 
-  const ABOUT = () => {
-    // Criam os item na navbar dependendo da pagina acessada
-    return getPath === '/' ? (
-      <span onClick={goAbout}>
-        <FontAwesomeIcon icon={faUsers} className='icon-menu' /> Sobre
-      </span>
-    ) : null
+  function goFaqPage() {
+    document.getElementById('Faq').scrollIntoView();
   };
 
-  const FAQ = () => {
-    return getPath === '/' ? (
-      <span onClick={goFaq}>
-        <FontAwesomeIcon icon={faQuestion} className='icon-menu' /> Dúvidas
-      </span>
-    ) : null
+  function goContactsPage() {
+    goPage("CARDS");
   };
 
-  const LOGIN = () => {
-    return getToken === null? (
-      <span onClick={goLogin}>
-        <FontAwesomeIcon icon={faUser} className='icon-menu' /> Entrar
+  function goNotesPage() {
+    goPage("CARDS");
+  };
+
+  function goTasksPage() {
+    goPage("CARDS");
+  };
+
+  function goWebsitePage() {
+    goPage("CARDS");
+  };
+
+
+  const ABOUT_LINK = () => {
+    if (isClient) {
+      return pathname === '/' ? (
+        <span onClick={goAboutPage}>
+          <FontAwesomeIcon icon={faUsers} /> Sobre
+        </span>
+      ) : null
+    }
+  };
+
+  const FAQ_LINK = () => {
+    if (isClient) {
+      return pathname === '/' ? (
+        <span onClick={goFaqPage}>
+          <FontAwesomeIcon icon={faQuestion} /> Dúvidas
+        </span>
+      ) : null
+    }
+  };
+
+  const CONTACTS_LINK = () => {
+    return isAuthenticated? (
+      <span onClick={goContactsPage}>
+        <FontAwesomeIcon icon={faImage}/> Contatos
       </span>
-    ) : (
-      <span onClick={goLogin}>
-        <FontAwesomeIcon icon={faRightFromBracket} className='icon-menu' /> Sair
+    ) : 
+      null
+  };
+
+  const NOTES_LINK = () => {
+    return isAuthenticated? (
+      <span onClick={goNotesPage}>
+        <FontAwesomeIcon icon={faImage}/> Notas
       </span>
+    ) : 
+      null
+  };
+
+  const TASKS_LINK = () => {
+    return isAuthenticated? (
+      <span onClick={goTasksPage}>
+        <FontAwesomeIcon icon={faImage}/> Tarefas
+      </span>
+    ) : 
+      null
+  };
+
+  const SITES_LINK = () => {
+    return isAuthenticated? (
+      <span onClick={goWebsitePage}>
+        <FontAwesomeIcon icon={faImage}/> Sites
+      </span>
+    ) : 
+      null
+  };
+
+  const LOGIN_LINK = () => {
+    return !isAuthenticated? (
+      <span onClick={goLoginPage}>
+        <FontAwesomeIcon icon={faUser} /> Entrar
+      </span>
+    ) : ( 
+      <span onClick={goLogout}>
+        <FontAwesomeIcon icon={faRightFromBracket}/> Sair
+      </span>     
     )
   };
 
-  const Contacts = () => {
-    return getToken !== null? (
-      <span onClick={goContacts}>
-        <FontAwesomeIcon icon={faUser} className='icon-menu' /> Contatos
-      </span>
-    ) : null
-  }
-
-  const Notes = () => {
-    return getToken !== null? (
-      <span onClick={goNotes}>
-        <FontAwesomeIcon icon={faNoteSticky} className='icon-menu' /> Notas
-      </span>
-    ) : null
-  }
-
-  const Projects = () => {
-    return getToken !== null? (
-      <span onClick={goTasks}>
-        <FontAwesomeIcon icon={faCheckSquare} className='icon-menu' /> Tarefas
-      </span>
-    ) : null
-  }
-
-  const Sites = () => {
-    return getToken !== null? (
-      <span onClick={goSites}>
-        <FontAwesomeIcon icon={faGlobeEurope} className='icon-menu' /> Sites
-      </span>
-    ) : null
-  }
-
-  //Funções de navegação pelas paginas
-  function goHome() {
-    if (getPath === '/') {
-      document.getElementById('Start').scrollIntoView();
-    } else {
-      router.push('/')
-    }
-    closeResponsiveMenu();
-  };
-
-  function goAbout() {
-    document.getElementById('About').scrollIntoView();
-    closeResponsiveMenu();
-  }
-
-  function goFaq() {
-    document.getElementById('Faq').scrollIntoView();
-    closeResponsiveMenu();
-  }
-
-  function genericGoTo(value) {
-    //Função generica para redirecionamento, se tokne for null redireciona para /login do contrario para a pagina passada como parametro
-    if (getToken !== null && typeof getToken === 'string') {
-      if (getPath !== value) {
-        router.push(value);
-      }
-    } else {
-      if (getPath === "/login") {
-        showLoginAlert()
-      } else {
-        router.push("/login");
-      }
-    }
-    closeResponsiveMenu();
-  };
-  
-  function goContacts() {
-    genericGoTo('/contacts')
-  }
-
-  function goTasks() {
-    genericGoTo('/tasks')
-  }
-
-  function goNotes() {
-    genericGoTo('/boards')
-  }
-
-  function goSites() {
-    genericGoTo('/websites')
-  }
-
-  function goLogin() {
-    if (getToken === null) {
-      router.push("/login")
-    } else {
-      sessionStorage.removeItem("token")
-      setToken(null)
-      router.push('/')
-    }
-  }
-
-  function showLoginAlert() {
-    // Mostra o alerta de login
-    const alert = document.getElementById('loginAlert');
-    alert.style.visibility = 'visible';
-
-    setTimeout(() => {
-      alert.style.visibility = 'hidden';
-    }, 2000);
-  }
-
   return (
     <nav>
-      <div className="menu" id="menu">
+      <span onClick={goHomePage}>
+        <FontAwesomeIcon icon={faHome}/> Inicio 
+      </span>
 
-        <span id='menuBtn' onClick={openResponsiveMenu}>
-          <FontAwesomeIcon icon={faBars} />
-        </span>
+      {ABOUT_LINK()}
 
-        <span onClick={goHome}>
-          <FontAwesomeIcon icon={faHome} /> Inicio 
-        </span>
+      {FAQ_LINK()}
 
-        {ABOUT()}
+      {CONTACTS_LINK()}
 
-        {FAQ()}
+      {NOTES_LINK()}
 
-        {Contacts()}
+      {TASKS_LINK()}
 
-        {Notes()}
+      {SITES_LINK()}
 
-        {Projects()}
+      {LOGIN_LINK()}
 
-        {Sites()}
-
-        {LOGIN()}
-
-      </div>
+      <Tooltip id="toolTip"/>
     </nav>
   )
 }

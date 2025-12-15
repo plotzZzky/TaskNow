@@ -2,8 +2,12 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"],
-      "@comps/*": ["./app/comps/*"],
       "@app/*": ["./app/*"],
+      "@comps/*": ["./app/comps/*"],
+      "@contacts/*": ["./app/comps/contacts/*"],
+      "@inputs/*": ["./app/comps/inputs/*"],
+      "@notes/*": ["./app/comps/notes/*"],
+      "@tasks/*": ["./app/comps/tasks/*"],
     }
   }
 }

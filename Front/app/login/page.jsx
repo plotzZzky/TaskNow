@@ -1,178 +1,303 @@
 'use client'
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import InputPwd from '@comps/inputs/inputPwd';
-import InputEmail from '@comps/inputs/inputEmail';
-import InputUser from '@comps/inputs/inputUser';
-import InputAnswer from '@comps/inputs/inputAnswer';
-import InputQuestion from '@comps/inputs/inputQuestion';
-import { useAuth } from '@comps/authContext'
+import { useEffect, useState } from 'react';
+import { useAuth } from '@comps/authContext';
+import { useApi } from '@hooks/useApi';
+import { useGenericGoPage } from '@hooks/useGoPage';
+import InputPwd from '@/app/antigos/inputs/inputPwd';
+import InputUser from '@/app/antigos/inputs/inputUser';
+import InputAnswer from '@/app/antigos/inputs/inputAnswer';
+import InputQuestion from '@/app/antigos/inputs/inputQuestion';
+import ImgInput from '@/app/comps/inputs/inputImg';
+import './page.css'
 
-export default function Login() {
-  const [getLogin, setLogin] = useState(true);
-  const [token, updateToken] = useAuth();
-  const router = useRouter();
 
+export default function AuthPage() {
+  const { isAuthenticated, loading, checkAuthStatus } = useAuth();
+  const goFrontPage = useGenericGoPage();
+  const fetchApi = useApi();
+
+  // Show inputs and pages
+  const [showRegister, setShowRegister] = useState(false);
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [showAlert, setShowAlert] = useState("");
+
+  // User data
   const [getUsername, setUsername] = useState("");
-  const [getEmail, setEmail] = useState("");
   const [getPassword, setPassword] = useState("");
   const [getpwd, setPwd] = useState("")
   const [getQuestion, setQuestion] = useState("");
   const [getAnswer, setAnswer] = useState("");
+  const [getImageUser, setImageUser] = useState("");
+  const [getFileUser, setFileUser] = useState("");
 
   //Validate
-  const [UserValid, setUserValid] = useState(false);
-  const [EmailValid, setEmailValid] = useState(false);
-  const [Pwd1Valid, setPwd1Valid] = useState(false);
-  const [Pwd2Valid, setPwd2Valid] = useState(false)
-  const [QuestionValid, setQuestionValid] = useState(false)
-  const [AnswerValid, setAnswerValid] = useState(false)
+  const [userValid, setUserValid] = useState(false);
+  const [pwd1Valid, setPwd1Valid] = useState(false);
+  const [pwd2Valid, setPwd2Valid] = useState(false)
+  const [questionValid, setQuestionValid] = useState(false)
+  const [answerValid, setAnswerValid] = useState(false)
+
 
   useEffect(() => {
-    checkLogin();
-  }, [])
+    if (isAuthenticated) {
+      goFrontPage("CARDS");
+    };
 
-  function checkLogin() {
-    if (token !== null) {
-      router.push("/find");
+  }, [isAuthenticated, loading])
+
+  // * * * Funções que controlam os inputs exibidos na pagina * * *
+  function showLoginPage() { // Exibe os inputs para login
+    genericShowPages(); 
+  };
+
+  function showRegisterPage() { // Exibe os inputs para registro
+    genericShowPages(true);
+  };
+
+  function showRecoveryPage() { // Exibe os inputs para recuperar a senha
+    setQuestion();
+    genericShowPages(true, true);
+  };
+
+  function genericShowPages(register=false, recovery=false) {
+    /** 
+    * Função generica para selecionar quais inputs são visiveis na pagina
+    */
+    setShowRegister(register); // Mostra ou não os inputs para registro
+    setShowRecovery(recovery); // Mostra ou não a pagina de recovery
+  };
+
+  async function loginFunction() {
+    /**
+    * Valida os campos, se tiver ok faz login e envia para pagina dos cards
+    */
+    if (pwd1Valid && userValid) {
+      const requestData = createRequestDataAndForm();
+      const response = await genericHTTPRequest("auth/login/", requestData, false);
+
+      if (response.ok) {
+        checkAuthStatus();
+
+      } else {
+        setShowAlert("Usuário ou senha incorretos.");
+      }
+
+    } else {
+      setShowAlert("Prencha os dados de login corretamente");
     };
   };
 
-  function showLogin() {
-    // Alterna entre a pagina de login e registro
-    const login = document.getElementById('loginTab');
-    const signup = document.getElementById('signupTab');
-    login.style.display = getLogin ? 'none' : 'block'
-    signup.style.display = getLogin ? 'block' : 'none'
-    setLogin(getLogin ? false : true);
-  };
-
-  function showRecovery() {
-    // Redireciona para a pagina de recuperação de senha
-    router.push('/login/recovery');
-  };
-
-  function checkIfLoginIsvalid() {
-    // Verifica se os campos de login estão preenchidas com informções validas
-    if (Pwd1Valid && UserValid) {
-      loginFunc()
-    } else {
-      const tip = document.getElementById("LoginTip")
-      tip.innerText = "Prencha os dados de login"
-    }
+  function registerFunction() {
+    genericRegisterOrRecoveryFunction("auth/register/");
   }
 
-  function loginFunc() {
-      // Função para fazer login
-    const url = `http://127.0.0.1:8000/users/login/`;
+  function recoveryFunction() {
+    genericRegisterOrRecoveryFunction("auth/recovery/update/");
+  }
 
-    const form = new FormData();
-    form.append("username", getUsername);
-    form.append("password", getPassword);
+  async function genericRegisterOrRecoveryFunction(url) {
+    /**
+    * Função usada para registro (recovery=false) e trocar a senha (recovery=true)
+    * @param {string} url - A url para solicitação
+    * 
+    * - Valida os campos,
+    * - Seleciona a url certa (register/recovery)
+    * - Faz a solicitação, se retornar ok, envia o usuario para a pagian dos cards
+    */
+    if (userValid && pwd1Valid && pwd2Valid && getPassword === getpwd) {
+      const requestData = createRequestDataAndForm(true);
+      const response = await genericHTTPRequest(url, requestData);
 
-    const requestData = {
-      method: 'POST',
-      body: form
-    };
+      if (response.ok) {
+        checkAuthStatus();
 
-    fetch(url, requestData)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.token) {
-          updateToken(data.token);
-          router.push('/tasks');
+      } else {
+        setShowAlert("Usuário ou senha incorretos.");
+      }
 
-        } else {
-          const tip = document.getElementById("LoginTip");
-          tip.innerText = data.error;
-        };
-    });
-  };
-
-
-  function checkIfSignIsValid() {
-    // Verifica se os campos de cadastro estão preenchidas com informções validas
-    if (UserValid && EmailValid && Pwd1Valid && Pwd2Valid && Pwd1Valid === Pwd2Valid) {
-      SignUpFunc();
     } else {
-      const tip = document.getElementById("SignTip");
-      tip.innerText = "Prencha os dados corretamente para se registar";
+      setShowAlert("Prencha os dados corretamente para se registar.");
     };
   };
 
-  function SignUpFunc() {
-    // Função para registar um novo usuario, envia o form com as informações (exceto imagem) e recebe o nome randonizado da imagem do usuario
-    const url = `http://127.0.0.1:8000/users/register/`
+  async function receiveQuestion() {
+    /**
+    * Recebe a question para a recuperação da senha
+    */
+    if (userValid) {
+      const requestData = createRequestDataAndForm();
+      const response = await genericHTTPRequest("auth/recovery/", requestData, true);
 
+      if (response) {
+        setQuestion(response.question);
+        setShowAlert("Preencha os dados corretamente para atualizar seu perfil.");
+
+      } else {
+        setShowAlert("Perfil não encontrado.")
+      }
+
+    } else {
+      setShowAlert("Preencha um nome de usuario válido.");
+    }
+  };
+
+  function createRequestDataAndForm(register=false) {
+    /**
+    * Cria o corpo da requisição com o formulario
+    * @param {boolean} register - Cria o formulario para registro ou login
+    * 
+    * - Cria o novo formulario
+    * - Se for registro=true, inclue os demais campos
+    * - Cria o corpo da requisição
+    */
     const form = new FormData();
     form.append("username", getUsername);
-    form.append("email", getEmail);
     form.append("password", getPassword);
-    form.append("pwd", getpwd);
-    form.append("question", getQuestion)
-    form.append("answer", getAnswer)
 
-    const requestData = {
-      method: 'POST', body: form
+    if (register) {
+      form.append("pwd", getpwd);
+      form.append("question", getQuestion);
+      form.append("answer", getAnswer);
+
+      if (getImageUser) {
+        form.set('enctype', 'multipart/form-data');
+        form.append("picture", getImageUser, getImageUser.name);
+      }
     };
 
-    fetch(url, requestData)
-      .then((res) =>  res.json())
-      .then((data) => {
-        if (data.token) {
-          updateToken(data.token);
-          router.push('/tasks');
-        } else {
-          const tip = document.getElementById("SignTip");
-          tip.innerText = data.msg;
-        }
-    });
+    const requestData = {
+      method: "POST",
+      body: form,
+    };
+
+    return requestData;
+  };
+
+  async function genericHTTPRequest(url, requestData, returnJson=false) {
+    /**
+    * Faz a solicitação e recebe a resposta
+    * @param {string} url - A url do back
+    * @param {json} requestData - Corpo da solicitação
+    * @param {boolean} returnJson - A função deve retorna o response ou o data(json)
+    */
+    try {
+      const response = await fetchApi(url, returnJson, requestData);
+
+      if (returnJson) {
+        return response; // Retorna o json (returnJson=true) sem verificar se esta ok, para evitar erros
+      }
+      
+      if (!response.ok) { // Se a resposta for diferente de 2xx retorna um error
+        const data = await response.json();
+        setShowAlert(data); // Exibe a mensagem de erro
+        return null;
+      }
+
+      return response; // Retorna o response se não for json
+
+    } catch (error) {
+      console.log(error);
+      setShowAlert("error"); // Exibe a mensagem de erro
+      return null;
+    }
+  };
+
+  const alertMsg = () => { // Exibe a mensagem no topo da tela
+    return showAlert?(
+      <div id='loginAlert'>
+        <span> {showAlert} </span>
+      </div>
+    ) : null
+  };
+
+  const LOGIN_PAGE = () => {
+    if (!showRegister && !showRecovery) {
+      return (
+        <>
+          <div id='loginAlign'>
+            <h3> Entrar na sua conta </h3>
+
+            <InputUser value={getUsername} setValue={setUsername} valid={userValid} setValid={setUserValid}/>
+            <InputPwd value={getPassword} setValue={setPassword} valid={pwd1Valid} setValid={setPwd1Valid}/>
+
+            <button onClick={loginFunction}> Entrar </button>
+
+            <p onClick={showRegisterPage}> Registar </p>
+            <p onClick={showRecoveryPage}> Recuperar senha </p>
+          </div>
+        </>
+      )
+    }
+  };
+
+  const REGISTER_PAGE = () => {
+    if (showRegister && !showRecovery) {
+      return (
+        <>
+          <div id='loginAlign'>
+            <h3> Criar uma nova conta </h3>
+
+            <ImgInput setImageUser={setImageUser} getFileUser={getFileUser} setFileUser={setFileUser}/>
+            <InputUser value={getUsername} setValue={setUsername} valid={userValid} setValid={setUserValid}/>
+            <InputPwd value={getPassword} setValue={setPassword} valid={pwd1Valid} setValid={setPwd1Valid}/>
+            <InputPwd value={getpwd} setValue={setPwd} valid={pwd2Valid} setValid={setPwd2Valid} confirm={true}/>
+            <InputQuestion value={getQuestion} setValue={setQuestion} valid={questionValid} setValid={setQuestionValid}/>
+            <InputAnswer value={getAnswer} setValue={setAnswer} valid={answerValid} setValid={setAnswerValid}/>
+
+            <button onClick={registerFunction}> Cadastrar </button>
+
+            <p onClick={showLoginPage}> Entrar </p>
+            <p onClick={showRecoveryPage}> Recuperar senha </p>
+          </div>
+        </>
+      )
+    }
+  };
+
+  const RECOVERY_PAGE = () => {
+    if (showRecovery) {
+      return getQuestion? (
+        <div id='loginAlign'>
+          <h3> Recuperar sua senha </h3>
+
+          <InputUser value={getUsername} setValue={setUsername} valid={userValid} setValid={setUserValid}/>
+          <InputPwd value={getPassword} setValue={setPassword} valid={pwd1Valid} setValid={setPwd1Valid}/>
+          <InputPwd value={getpwd} setValue={setPwd} valid={pwd2Valid} setValid={setPwd2Valid} confirm={true}/>
+          <InputQuestion value={getQuestion} setValue={setQuestion} valid={questionValid} setValid={setQuestionValid}/>
+          <InputAnswer value={getAnswer} setValue={setAnswer} valid={answerValid} setValid={setAnswerValid}/>
+
+          <button onClick={recoveryFunction}> Recuperar senha </button>
+
+          <p onClick={showLoginPage}> Entrar </p>
+          <p onClick={showRegisterPage}> Cadastre-se </p>
+        </div>
+      ) : (
+        <div id='loginAlign'>
+          <h3> Buscar perfil </h3>
+
+          <InputUser value={getUsername} setValue={setUsername} valid={userValid} setValid={setUserValid}/>
+
+          <button onClick={receiveQuestion}> Buscar </button>
+
+          <p onClick={showLoginPage}> Entrar </p>
+          <p onClick={showRegisterPage}> Cadastre-se </p>
+        </div>
+      )
+    }
   };
 
   return (
     <section>
-      <div className="login-page">
-        <div className="login-alert" id='loginAlert'>
-          <a> Você precisa fazer login!</a>
-        </div>
+      <div id='login'>
 
-        <div className='login-div' id='loginTab'>
-          <h2> Bem vindo de volta!</h2>
+        {alertMsg()}
 
-          <div className='align-input'>
-            <InputUser username={setUsername} valid={UserValid} setValid={setUserValid} tip='LoginTip'></InputUser>
-            <InputPwd password={setPassword} valid={Pwd1Valid} setValid={setPwd1Valid} placeholder="Digite a senha" tip='LoginTip'></InputPwd>
-          </div>
+        {LOGIN_PAGE()}
 
-          <h3 id='LoginTip'></h3>
+        {REGISTER_PAGE()}
 
-          <button className='btn-login' onClick={checkIfLoginIsvalid}> Entrar </button>
-
-          <p onClick={showLogin}> Cadastre-se </p>
-          <p onClick={showRecovery}> Recuperar senha </p>
-        </div>
-
-        <div className='login-div' id='signupTab' style={{ display: 'none' }}>
-          <h2> Junte-se a nós! </h2>
-
-          <div className='align-input'>
-
-            <InputUser username={setUsername} valid={UserValid} setValid={setUserValid} tip='SignTip'></InputUser>
-            <InputEmail email={setEmail} valid={EmailValid} setValid={setEmailValid} tip='SignTip'></InputEmail>
-            <InputPwd password={setPassword} valid={Pwd1Valid} setValid={setPwd1Valid} placeholder="Digite a senha" tip='SignTip'></InputPwd>
-            <InputPwd password={setPwd} valid={Pwd2Valid} setValid={setPwd2Valid} placeholder="Comfirme a senha" tip='SignTip'></InputPwd>
-            <InputQuestion question={setQuestion} valid={QuestionValid} setValid={setQuestionValid} tip='SignTip'></InputQuestion>
-            <InputAnswer answer={setAnswer} valid={AnswerValid} setValid={setAnswerValid} tip='SignTip'></InputAnswer>
-
-          </div>
-
-          <h3 id='SignTip'></h3>
-          
-          <button className='btn-login' onClick={checkIfSignIsValid}> Cadastrar </button>
-
-          <p onClick={showLogin}> Entrar </p>
-          <p onClick={showRecovery}> Recuperar senha </p>
-        </div>
+        {RECOVERY_PAGE()}
+        
       </div>
     </section>
   )

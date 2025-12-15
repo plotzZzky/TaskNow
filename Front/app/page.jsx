@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckSquare } from '@fortawesome/free-solid-svg-icons';
 
 
-export default function Home() {
+export default function HomePage() {
   const [Token, updateToken] = useAuth();
   const router = useRouter();
 
@@ -65,16 +65,20 @@ export default function Home() {
 
   return (
     <>
-      <section className='banner' id='Start'>
-        <h1 className='big-title'> TaskNow <FontAwesomeIcon icon={faCheckSquare} className='market-icon' /> </h1>
-        <h2 className='subtitle'> O jeito fácil de gerenciar sua vida.</h2>
+      <section id='Start'>
+
+        <h1> TaskNow <FontAwesomeIcon icon={faCheckSquare} className='market-icon' /> </h1>
+
+        <h2 className='subtitle'> O jeito fácil de gerenciar sua vida. </h2>
 
         <div className='home-align-btns'>
           <button onClick={goToLogin}> Começar agora! </button>
         </div>
+
       </section>
 
       <section id='About'>
+
         <h1> Sobre o TaskNow... </h1>
         <h2> Simplifique sua vida com o TaskNow - a plataforma tudo-em-um para gerenciar tarefas. </h2> 
         <h2> Crie, organize, priorize de forma eficaz suas tarefas para alcançar seus objetivos com facilidade e praticidade. </h2>
@@ -90,7 +94,9 @@ export default function Home() {
 
       <section id='Faq'>
         <h1> Duvias frequentes: </h1>
+
         {faqItems()}
+
       </section>
     </>
   )

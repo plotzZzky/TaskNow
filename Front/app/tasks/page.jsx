@@ -8,7 +8,7 @@ import { faFloppyDisk, faSquareCheck } from '@fortawesome/free-solid-svg-icons'
 import ProjectCard from "@comps/tasks/projectCard";
 
 
-export default function Projects() {
+export default function ProjectsPage() {
   const [token, updateToken] = useAuth();
   const router = useRouter();
 
@@ -21,17 +21,18 @@ export default function Projects() {
     loadProjects();
   }, [])
 
-  function loadProjects() {
-    const cached = retriveItemFromSessionStorage("projects");
+  async function loadProjects() {
+    const cached = await retriveItemFromSessionStorage("projects");
 
     if (cached) {
       createCards(cached);
+
     } else {
-      getProjectsOnBack();
+      receiveProjetosFromBack();
     };
   };
 
-  function getProjectsOnBack() {
+  async function receiveProjetosFromBack() {
     // Busca as informações dos cards no back
     const url = process.env("BACK_PROJECTS_URL");
 
@@ -59,7 +60,7 @@ export default function Projects() {
     };
   };
 
-  function createNewProject() {
+  async function createNewProject() {
     // Cria um novo projeto
     const url = 'http://127.0.0.1:8000/projects/'
 
@@ -90,34 +91,42 @@ export default function Projects() {
     setTaskDesc(event.target.value);
   };
 
-  return (
-    <section>
-      <h2> Seus projetos </h2>
-      <div className="cards">
-      
-        <div className="margin">
-          <div className="card">
+  const INPUT_CARD = () => {
+    return (
+      <div className="margin">
+        <div className="card">
 
-              <div className="card-row">
-                <FontAwesomeIcon className='card-big-btn' icon={faSquareCheck}/>
+            <div className="card-row">
+              <FontAwesomeIcon className='card-big-btn' icon={faSquareCheck}/>
 
-                <input className="card-input card-title" onChange={handleProjectTitle} value={getTaskTitle}></input>
+              <input className="card-input card-title" onChange={handleProjectTitle} value={getTaskTitle}></input>
 
-                <div className="card-btns"> 
-                  <FontAwesomeIcon icon={faFloppyDisk} onClick={createNewProject} className='card-btn'/>
-                </div>
+              <div className="card-btns"> 
+                <FontAwesomeIcon icon={faFloppyDisk} onClick={createNewProject} className='card-btn'/>
               </div>
+            </div>
 
-              <div className="card-row">
-                <textarea className="card-input" onChange={handleProjectDesc} value={getTaskDesc}></textarea>
-              </div>
+            <div className="card-row">
+              <textarea className="card-input" onChange={handleProjectDesc} value={getTaskDesc}></textarea>
+            </div>
 
-          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (true) {
+    return (
+      <section>
+        <h2> Seus projetos </h2>
+
+        <div className="cards">
+          {INPUT_CARD()}
+
+          {getCards}
         </div>
 
-        {getCards}
-
-      </div>
-    </section>
-  )
+      </section>
+    )
+  }
 }
